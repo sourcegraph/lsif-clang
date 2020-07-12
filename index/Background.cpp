@@ -393,7 +393,7 @@ llvm::Error BackgroundIndex::index(tooling::CompileCommand Cmd) {
 
   IndexFileIn Index;
   auto Action = createStaticIndexingAction(
-      IndexOpts, [&](SymbolSlab S) { Index.Symbols = std::move(S); },
+      IndexOpts, {}, [&](SymbolSlab S) { Index.Symbols = std::move(S); },
       [&](RefSlab R) { Index.Refs = std::move(R); },
       [&](RelationSlab R) { Index.Relations = std::move(R); },
       [&](IncludeGraph IG) { Index.Sources = std::move(IG); });

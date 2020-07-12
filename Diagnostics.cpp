@@ -7,7 +7,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "Diagnostics.h"
-#include "../clang-tidy/ClangTidyDiagnosticConsumer.h"
+#include "clang-tidy/ClangTidyDiagnosticConsumer.h"
 #include "Compiler.h"
 #include "Logger.h"
 #include "Protocol.h"

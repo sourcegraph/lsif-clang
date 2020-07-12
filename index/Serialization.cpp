@@ -637,6 +637,9 @@ void writeRIFF(const IndexFileOut &Data, llvm::raw_ostream &OS) {
 void writeYAML(const IndexFileOut &, llvm::raw_ostream &);
 llvm::Expected<IndexFileIn> readYAML(llvm::StringRef);
 
+// Defined in LSIFSerialization.cpp.
+void writeLSIF(const IndexFileOut &, llvm::raw_ostream &);
+
 llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, const IndexFileOut &O) {
   switch (O.Format) {
   case IndexFileFormat::RIFF:
@@ -644,6 +647,9 @@ llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, const IndexFileOut &O) {
     break;
   case IndexFileFormat::YAML:
     writeYAML(O, OS);
+    break;
+  case IndexFileFormat::LSIF:
+    writeLSIF(O, OS);
     break;
   }
   return OS;

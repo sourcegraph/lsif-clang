@@ -1,23 +1,30 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../)
 
-set(LLVM_LINK_COMPONENTS
-    Support
-    )
-
-add_clang_executable(clangd-indexer
+add_executable(lsif-clang
   IndexerMain.cpp
   )
 
-clang_target_link_libraries(clangd-indexer
-  PRIVATE
+install(TARGETS lsif-clang)
+
+set(CLANG_LIBS
+  clangDaemonFork
   clangAST
   clangBasic
   clangFrontend
   clangIndex
   clangLex
   clangTooling
+  stdc++
 )
-target_link_libraries(clangd-indexer
-  PRIVATE
-  clangDaemon
-)
+
+if (LLVM IN_LIST LLVM_AVAILABLE_LIBS)
+  target_link_libraries(lsif-clang
+    LLVM
+    ${CLANG_LIBS}
+  )
+else()
+  target_link_libraries(lsif-clang
+    LLVMSupport
+    ${CLANG_LIBS}
+  )
+endif()

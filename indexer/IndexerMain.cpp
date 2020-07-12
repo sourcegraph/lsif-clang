@@ -16,6 +16,7 @@
 #include "index/Serialization.h"
 #include "index/Symbol.h"
 #include "index/SymbolCollector.h"
+#include "clang/Index/IndexingOptions.h"
 #include "clang/Tooling/ArgumentsAdjusters.h"
 #include "clang/Tooling/CommonOptionsParser.h"
 #include "clang/Tooling/Execution.h"
@@ -27,13 +28,17 @@ namespace clang {
 namespace clangd {
 namespace {
 
-static llvm::cl::opt<IndexFileFormat>
-    Format("format", llvm::cl::desc("Format of the index to be written"),
-           llvm::cl::values(clEnumValN(IndexFileFormat::YAML, "yaml",
-                                       "human-readable YAML format"),
-                            clEnumValN(IndexFileFormat::RIFF, "binary",
-                                       "binary RIFF format")),
-           llvm::cl::init(IndexFileFormat::RIFF));
+static llvm::cl::opt<IndexFileFormat> Format(
+    "format", llvm::cl::desc("Format of the index to be written"),
+    llvm::cl::values(
+        clEnumValN(IndexFileFormat::YAML, "yaml", "human-readable YAML format"),
+        clEnumValN(IndexFileFormat::RIFF, "binary", "binary RIFF format"),
+        clEnumValN(IndexFileFormat::LSIF, "lsif", "exportable LSIF format")),
+    llvm::cl::init(IndexFileFormat::RIFF));
+
+static llvm::cl::opt<std::string> ProjectRoot(
+    "project-root", llvm::cl::desc("Absolute path to root directory of project being indexed"),
+    llvm::cl::init(""));
 
 class IndexActionFactory : public tooling::FrontendActionFactory {
 public:
@@ -42,8 +47,17 @@ public:
   std::unique_ptr<FrontendAction> create() override {
     SymbolCollector::Options Opts;
     Opts.CountReferences = true;
+    Opts.CollectMainFileSymbols = true;
+    Opts.StoreAllDocumentation = true;
+    clang::index::IndexingOptions IndexOpts;
+    IndexOpts.IndexFunctionLocals = true;
+    IndexOpts.IndexParametersInDeclarations = true;
+    IndexOpts.IndexImplicitInstantiation = true;
+    IndexOpts.IndexMacrosInPreprocessor = true;
+    IndexOpts.SystemSymbolFilter = index::IndexingOptions::SystemSymbolFilterKind::All;
     return createStaticIndexingAction(
         Opts,
+        IndexOpts,
         [&](SymbolSlab S) {
           // Merge as we go.
           std::lock_guard<std::mutex> Lock(SymbolsMu);
@@ -128,6 +142,7 @@ int main(int argc, const char **argv) {
   // Emit collected data.
   clang::clangd::IndexFileOut Out(Data);
   Out.Format = clang::clangd::Format;
+  Out.ProjectRoot = "file://" + clang::clangd::ProjectRoot;
   llvm::outs() << Out;
   return 0;
 }

@@ -9,7 +9,7 @@
 #ifndef LLVM_CLANG_TOOLS_EXTRA_CLANGD_CLANGDSERVER_H
 #define LLVM_CLANG_TOOLS_EXTRA_CLANGD_CLANGDSERVER_H
 
-#include "../clang-tidy/ClangTidyOptions.h"
+#include "clang-tidy/ClangTidyOptions.h"
 #include "Cancellation.h"
 #include "CodeComplete.h"
 #include "FSProvider.h"

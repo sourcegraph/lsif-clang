@@ -204,17 +204,16 @@ private:
 
 std::unique_ptr<FrontendAction> createStaticIndexingAction(
     SymbolCollector::Options Opts,
+    index::IndexingOptions IndexOpts,
     std::function<void(SymbolSlab)> SymbolsCallback,
     std::function<void(RefSlab)> RefsCallback,
     std::function<void(RelationSlab)> RelationsCallback,
     std::function<void(IncludeGraph)> IncludeGraphCallback) {
-  index::IndexingOptions IndexOpts;
   IndexOpts.SystemSymbolFilter =
       index::IndexingOptions::SystemSymbolFilterKind::All;
   Opts.CollectIncludePath = true;
   if (Opts.Origin == SymbolOrigin::Unknown)
     Opts.Origin = SymbolOrigin::Static;
-  Opts.StoreAllDocumentation = false;
   if (RefsCallback != nullptr) {
     Opts.RefFilter = RefKind::All;
     Opts.RefsInHeaders = true;
@@ -223,7 +222,7 @@ std::unique_ptr<FrontendAction> createStaticIndexingAction(
   Opts.Includes = Includes.get();
   return std::make_unique<IndexAction>(
       std::make_shared<SymbolCollector>(std::move(Opts)), std::move(Includes),
-      IndexOpts, SymbolsCallback, RefsCallback, RelationsCallback,
+      std::move(IndexOpts), SymbolsCallback, RefsCallback, RelationsCallback,
       IncludeGraphCallback);
 }
 

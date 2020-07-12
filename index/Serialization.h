@@ -36,6 +36,7 @@ namespace clangd {
 enum class IndexFileFormat {
   RIFF, // Versioned binary format, suitable for production use.
   YAML, // Human-readable format, suitable for experiments and debugging.
+  LSIF, // Language Server Index Format, suitable for export to other tools.
 };
 
 // Holds the contents of an index file that was read.
@@ -60,6 +61,7 @@ struct IndexFileOut {
   const IncludeGraph *Sources = nullptr;
   // TODO: Support serializing Dex posting lists.
   IndexFileFormat Format = IndexFileFormat::RIFF;
+  std::string ProjectRoot = "";
   const tooling::CompileCommand *Cmd = nullptr;
 
   IndexFileOut() = default;
