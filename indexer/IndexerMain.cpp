@@ -28,13 +28,13 @@ namespace clang {
 namespace clangd {
 namespace {
 
-static llvm::cl::opt<IndexFileFormat> Format(
-    "format", llvm::cl::desc("Format of the index to be written"),
-    llvm::cl::values(
-        clEnumValN(IndexFileFormat::YAML, "yaml", "human-readable YAML format"),
-        clEnumValN(IndexFileFormat::RIFF, "binary", "binary RIFF format"),
-        clEnumValN(IndexFileFormat::LSIF, "lsif", "exportable LSIF format")),
-    llvm::cl::init(IndexFileFormat::RIFF));
+// static llvm::cl::opt<IndexFileFormat> Format(
+//     "format", llvm::cl::desc("Format of the index to be written"),
+//     llvm::cl::values(
+//         clEnumValN(IndexFileFormat::YAML, "yaml", "human-readable YAML format"),
+//         clEnumValN(IndexFileFormat::RIFF, "binary", "binary RIFF format"),
+//         clEnumValN(IndexFileFormat::LSIF, "lsif", "exportable LSIF format")),
+//     llvm::cl::init(IndexFileFormat::RIFF));
 
 static llvm::cl::opt<std::string> ProjectRoot(
     "project-root", llvm::cl::desc("Absolute path to root directory of project being indexed"),
@@ -141,7 +141,7 @@ int main(int argc, const char **argv) {
 
   // Emit collected data.
   clang::clangd::IndexFileOut Out(Data);
-  Out.Format = clang::clangd::Format;
+  Out.Format = clang::clangd::IndexFileFormat::LSIF;
   Out.ProjectRoot = "file://" + clang::clangd::ProjectRoot;
   llvm::outs() << Out;
   return 0;
