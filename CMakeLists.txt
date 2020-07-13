@@ -37,24 +37,24 @@ add_library(clangDaemonFork
   # Diagnostics.cpp
   # DraftStore.cpp
   ExpectedTypes.cpp
-  FindSymbols.cpp
+  # FindSymbols.cpp
   FindTarget.cpp
-  FileDistance.cpp
-  Format.cpp
-  FS.cpp
-  FSProvider.cpp
-  FormattedString.cpp
+  # FileDistance.cpp
+  # Format.cpp
+  # FS.cpp
+  # FSProvider.cpp
+  # FormattedString.cpp
   FuzzyMatch.cpp
-  GlobalCompilationDatabase.cpp
+  # GlobalCompilationDatabase.cpp
   Headers.cpp
   # HeaderSourceSwitch.cpp
   # Hover.cpp
   # IncludeFixer.cpp
   # JSONTransport.cpp
   Logger.cpp
-  PathMapping.cpp
+  # PathMapping.cpp
   Protocol.cpp
-  Quality.cpp
+  # Quality.cpp
   # ParsedAST.cpp
   # Preamble.cpp
   # RIFF.cpp
@@ -80,7 +80,7 @@ add_library(clangDaemonFork
   index/Index.cpp
   index/IndexAction.cpp
   index/LSIFSerialization.cpp
-  index/MemIndex.cpp
+  # index/MemIndex.cpp
   index/Merge.cpp
   index/Ref.cpp
   index/Relation.cpp
@@ -92,10 +92,10 @@ add_library(clangDaemonFork
   index/SymbolOrigin.cpp
   # index/YAMLSerialization.cpp
 
-  index/dex/Dex.cpp
-  index/dex/Iterator.cpp
-  index/dex/PostingList.cpp
-  index/dex/Trigram.cpp
+  # index/dex/Dex.cpp
+  # index/dex/Iterator.cpp
+  # index/dex/PostingList.cpp
+  # index/dex/Trigram.cpp
 
   # refactor/Rename.cpp
   # refactor/Tweak.cpp
