@@ -11,6 +11,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "LSIFSerialization.h"
 #include "Index.h"
 #include "Relation.h"
 #include "Serialization.h"

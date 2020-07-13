@@ -16,7 +16,7 @@
 #define LLVM_CLANG_TOOLS_EXTRA_CLANGD_COMPILER_H
 
 #include "GlobalCompilationDatabase.h"
-#include "clang-tidy/ClangTidyOptions.h"
+// #include "clang-tidy/ClangTidyOptions.h"
 #include "index/Index.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Frontend/PrecompiledPreamble.h"
@@ -36,7 +36,7 @@ public:
 
 // Options to run clang e.g. when parsing AST.
 struct ParseOptions {
-  tidy::ClangTidyOptions ClangTidyOpts;
+  // tidy::ClangTidyOptions ClangTidyOpts;
   bool SuggestMissingIncludes = false;
 };
 

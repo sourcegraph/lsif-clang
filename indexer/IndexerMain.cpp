@@ -11,6 +11,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "index/IndexAction.h"
+#include "index/LSIFSerialization.h"
 #include "index/Merge.h"
 #include "index/Ref.h"
 #include "index/Serialization.h"
@@ -143,6 +144,6 @@ int main(int argc, const char **argv) {
   clang::clangd::IndexFileOut Out(Data);
   Out.Format = clang::clangd::IndexFileFormat::LSIF;
   Out.ProjectRoot = "file://" + clang::clangd::ProjectRoot;
-  llvm::outs() << Out;
+  writeLSIF(Out, llvm::outs());
   return 0;
 }

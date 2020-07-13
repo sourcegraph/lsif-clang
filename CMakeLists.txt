@@ -1,5 +1,7 @@
 project(LSIFClang)
 cmake_minimum_required(VERSION 3.16)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -29,10 +31,10 @@ add_library(clangDaemonFork
   # ClangdServer.cpp
   # CodeComplete.cpp
   CodeCompletionStrings.cpp
-  CompileCommands.cpp
-  Compiler.cpp
+  # CompileCommands.cpp
+  # Compiler.cpp
   Context.cpp
-  Diagnostics.cpp
+  # Diagnostics.cpp
   # DraftStore.cpp
   ExpectedTypes.cpp
   FindSymbols.cpp
@@ -46,16 +48,16 @@ add_library(clangDaemonFork
   GlobalCompilationDatabase.cpp
   Headers.cpp
   # HeaderSourceSwitch.cpp
-  Hover.cpp
+  # Hover.cpp
   # IncludeFixer.cpp
   # JSONTransport.cpp
   Logger.cpp
   PathMapping.cpp
   Protocol.cpp
   Quality.cpp
-  ParsedAST.cpp
+  # ParsedAST.cpp
   # Preamble.cpp
-  RIFF.cpp
+  # RIFF.cpp
   # Selection.cpp
   # SemanticHighlighting.cpp
   # SemanticSelection.cpp
@@ -66,7 +68,7 @@ add_library(clangDaemonFork
   Trace.cpp
   # TUScheduler.cpp
   URI.cpp
-  XRefs.cpp
+  # XRefs.cpp
 
   # index/Background.cpp
   # index/BackgroundIndexLoader.cpp
@@ -74,7 +76,7 @@ add_library(clangDaemonFork
   # index/BackgroundQueue.cpp
   # index/BackgroundRebuild.cpp
   index/CanonicalIncludes.cpp
-  index/FileIndex.cpp
+  # index/FileIndex.cpp
   index/Index.cpp
   index/IndexAction.cpp
   index/LSIFSerialization.cpp
@@ -82,13 +84,13 @@ add_library(clangDaemonFork
   index/Merge.cpp
   index/Ref.cpp
   index/Relation.cpp
-  index/Serialization.cpp
+  # index/Serialization.cpp
   index/Symbol.cpp
   index/SymbolCollector.cpp
   index/SymbolID.cpp
   index/SymbolLocation.cpp
   index/SymbolOrigin.cpp
-  index/YAMLSerialization.cpp
+  # index/YAMLSerialization.cpp
 
   index/dex/Dex.cpp
   index/dex/Iterator.cpp
@@ -96,7 +98,7 @@ add_library(clangDaemonFork
   index/dex/Trigram.cpp
 
   # refactor/Rename.cpp
-  refactor/Tweak.cpp
+  # refactor/Tweak.cpp
   )
 
 set(CLANGD_ATOMIC_LIB "")
@@ -115,7 +117,7 @@ set(CLANG_DAEMON_LIBS
   clangLex
   clangSema
   clangSerialization
-  clangTidy
+  # clangTidy
   clangTooling
   clangToolingCore
   clangToolingInclusions
