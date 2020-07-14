@@ -124,7 +124,7 @@ set(CLANG_DAEMON_LIBS
   clangToolingRefactoring
   clangToolingSyntax
   ${LLVM_PTHREAD_LIB}
-  ${CLANGD_ATOMIC_LIB}
+  # ${CLANGD_ATOMIC_LIB}
   ${ALL_CLANG_TIDY_CHECKS}
   m
 )
