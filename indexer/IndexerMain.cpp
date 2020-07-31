@@ -41,6 +41,11 @@ static llvm::cl::opt<std::string> ProjectRoot(
     "project-root", llvm::cl::desc("Absolute path to root directory of project being indexed"),
     llvm::cl::init(""));
 
+static llvm::cl::opt<bool> Debug(
+    "debug",
+    llvm::cl::desc("Enable verbose debug output."),
+    llvm::cl::init(false));
+
 class IndexActionFactory : public tooling::FrontendActionFactory {
 public:
   IndexActionFactory(IndexFileIn &Result) : Result(Result) {}
@@ -144,6 +149,7 @@ int main(int argc, const char **argv) {
   clang::clangd::IndexFileOut Out(Data);
   Out.Format = clang::clangd::IndexFileFormat::LSIF;
   Out.ProjectRoot = "file://" + clang::clangd::ProjectRoot;
+  Out.Debug = clang::clangd::Debug;
   writeLSIF(Out, llvm::outs());
   return 0;
 }

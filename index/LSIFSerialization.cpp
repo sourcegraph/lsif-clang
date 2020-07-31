@@ -64,9 +64,10 @@ template <> struct DenseMapInfo<clang::clangd::SymbolLocation> {
 namespace {
 struct LSIFMeta {
   LSIFMeta(llvm::raw_ostream &OS, const clang::clangd::IndexFileOut &O)
-      : OS(OS), ProjectRoot(O.ProjectRoot) {}
+    : OS(OS), ProjectRoot(O.ProjectRoot), Debug(O.Debug) {}
   llvm::raw_ostream &OS;
   const std::string ProjectRoot;
+  const bool Debug;
   int IDCounter = 0;
   llvm::StringMap<int> DocumentIDs;
   llvm::DenseMap<clang::clangd::SymbolID, int> ReferenceResultIDs;
@@ -74,7 +75,11 @@ struct LSIFMeta {
   llvm::DenseMap<clang::clangd::SymbolLocation, int> RangeIDs;
 
   bool contains(const char *FileURI) {
-    return FileURI && llvm::StringRef(FileURI).startswith(ProjectRoot);
+    bool contains = FileURI && llvm::StringRef(FileURI).startswith(ProjectRoot);
+    if (Debug && !contains) {
+      llvm::errs() << "debug: Excluding file " << FileURI << " from project " << ProjectRoot << "\n";
+    }
+    return contains;
   }
 };
 
