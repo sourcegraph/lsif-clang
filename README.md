@@ -8,7 +8,7 @@ This project has only been tested extensively on C++ projects, but C and Objecti
 
 ## Dependencies
 
-This project depends on LLVM and Clang. This code is tested to work with version 10, but should work with other versions with minor tweaks. Open an issue if you need to use a different version, You can try finding the location of your llvm installation by running `readlink -f $(which clang)`. On my computer, this returns `/usr/lib/llvm-10/bin/clang`, so the installation path is `/usr/lib/llvm-10`.
+This project depends on LLVM and Clang. The code builds against LLVM and Clang version 10, but can index a wide variety of code. Please file an issue if you need to build against a different version of LLVM or Clang and we can start adding some version pragmas! You can try finding the location of your llvm installation by running `readlink -f $(which clang)`. On my computer, this returns `/usr/lib/llvm-10/bin/clang`, so the installation path is `/usr/lib/llvm-10`.
 
 ## Building
 The project builds with CMake, so if you know what you're doing you can configure it yourself. For sensible defaults:
