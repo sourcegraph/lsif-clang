@@ -1,4 +1,4 @@
-# lsif-clang
+# lsif-clang indexer ![](https://img.shields.io/badge/status-development-yellow?style=flat)
 
 This project is a fork of [clangd](https://clangd.llvm.org/) with patches to add support for outputting [LSIF indexes](https://microsoft.github.io/language-server-protocol/specifications/lsif/0.5.0/specification/). Specifically, a fork of the `clang-tools-extra/clangd` subdirectory of the [llvm-project repo](https://github.com/llvm/llvm-project/).
 
