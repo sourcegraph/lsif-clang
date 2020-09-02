@@ -67,6 +67,24 @@ lsif-clang --project-root=$(pwd) file1.cpp file2.cpp ... > dump.lsif
 
 Note that this will still include lots of data about other files to properly supply hovers and such.
 
+### Platform-specific instructions
+
+#### On MacOS
+
+The indexer may fail to find system header files on MacOS (and possibly other systems) resulting in console error messages such as `fatal error: stdarg.h not found`.
+
+A workaround is to supply clang arguments via `--extra-arg`, which will be passed to each of the underlying translation unit compile commands. For example:`
+
+```bash
+$ clang -print-resource-dir
+/Library/Developer/CommandLineTools/usr/lib/clang/11.0.3
+
+$ lsif-clang \
+  --extra-arg='-resource-dir=/Library/Developer/CommandLineTools/usr/lib/clang/11.0.3' \
+  --executor=all-TUs \
+  compile_commands.json > dump.lsif
+```
+
 # Alternatives for C++ Projects
 
 If you can't get `lsif-clang` working with your project, first file an issue! We want this to work everywhere. But the C++ ecosystem is fragmented, and it's possible that your project simply won't play nice with the `clang` toolchain. [lsif-cpp](https://github.com/sourcegraph/lsif-cpp) is also available, which acts as a plugin for arbitrary C++ compilers and might therefore be compatible. But it has several major defects compared to `lsif-clang` (it is much slower and does not provide hovers), and is not the recommended option.
