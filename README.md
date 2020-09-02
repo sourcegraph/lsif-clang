@@ -12,21 +12,25 @@ This project depends on LLVM and Clang. The code builds against LLVM and Clang v
 
 ## Building
 The project builds with CMake, so if you know what you're doing you can configure it yourself. For sensible defaults:
+
 ```sh
 PATH_TO_LLVM=<path> ./config.sh build
 cd build
 make -j8
 sudo make install
 ```
+
 `PATH_TO_LLVM` should point to the llvm installation path from the previous step. The `8` in `make -j8` should be the number of threads you wish to allocate to the build (it's fairly small so it shouldn't matter much, but `make` is single threaded by default).
 
 ## Give it a whirl!
 
 Assuming you followed the steps above, do the following from this project's root directory:
+
 ```sh
 ln -s $(pwd)/build/compile_commands.json ./
 lsif-clang --project-root=$(pwd) --executor=all-TUs compile_commands.json > dump.lsif
 ```
+
 Inspect the file when it's done, you should see lots of glorious JSON!
 
 # Usage
@@ -50,11 +54,13 @@ Use the [bazel-compilation-database](https://github.com/grailbio/bazel-compilati
 ## Indexing
 
 Once you have `compile_commands.json` at the root of your source tree, you can invoke `lsif-clang` like so:
+
 ```sh
 lsif-clang --project-root=$(pwd) --executor=all-TUs compile_commands.json > dump.lsif
 ```
 
 This will index the entire project. To index only some files, run:
+
 ```sh
 lsif-clang --project-root=$(pwd) file1.cpp file2.cpp ... > dump.lsif
 ```
