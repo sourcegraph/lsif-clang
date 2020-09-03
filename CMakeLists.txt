@@ -15,12 +15,8 @@ set (search_paths
   $ENV{PATH_TO_LLVM}/share/llvm/cmake/
 )
 
-find_package(LLVM REQUIRED CONFIG
-             PATHS ${search_paths}
-             NO_DEFAULT_PATH)
-find_package(Clang REQUIRED CONFIG
-             PATHS ${search_paths}
-             NO_DEFAULT_PATH)
+find_package(LLVM REQUIRED)
+find_package(Clang REQUIRED)
 
 include_directories(${LLVM_INCLUDE_DIRS})
 
