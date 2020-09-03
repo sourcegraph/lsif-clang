@@ -124,8 +124,6 @@ int main(int argc, const char **argv) {
   Example usage for file sequence index without flags:
 
   $ clangd-indexer File1.cpp File2.cpp ... FileN.cpp > clangd.dex
-
-  Note: only symbols from header files will be indexed.
   )";
 
   auto Executor = clang::tooling::createExecutorFromCommandLineArgs(

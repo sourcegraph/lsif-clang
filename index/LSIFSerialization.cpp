@@ -172,7 +172,7 @@ void writeMetaTuple(LSIFMeta &Meta, const clang::clangd::IndexFileOut &O) {
 
 void writeProjectTuple(LSIFMeta &Meta, const clang::clangd::IndexFileOut &O) {
   writeVertex(Meta, "project",
-              [&](JOStream &JSONOut) { JSONOut.attribute("kind", "go"); });
+              [&](JOStream &JSONOut) { JSONOut.attribute("kind", "cpp"); });
 }
 
 void writeDocumentTuple(LSIFMeta &Meta, const llvm::StringRef FileURI,
