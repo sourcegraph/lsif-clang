@@ -317,7 +317,7 @@ void writeSymbol(LSIFMeta &Meta, const clang::clangd::Symbol &Sym,
   for (const auto &Ref : Refs) {
     if (!Meta.contains(Ref.Location.FileURI))
       continue;
-    writeRange(Meta, Ref.Location, ResultSetID, ReferenceResultID,
+    writeRange(Meta, Ref.Location, lang(Sym), ResultSetID, ReferenceResultID,
                "references");
   }
 }
