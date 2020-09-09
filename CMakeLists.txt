@@ -2,17 +2,18 @@ project(LSIFClang)
 cmake_minimum_required(VERSION 3.16)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 set (search_paths
-  $ENV{PATH_TO_LLVM}
-  $ENV{PATH_TO_LLVM}/lib/cmake
-  $ENV{PATH_TO_LLVM}/lib/cmake/llvm
-  $ENV{PATH_TO_LLVM}/lib/cmake/clang
-  $ENV{PATH_TO_LLVM}/share/clang/cmake/
-  $ENV{PATH_TO_LLVM}/share/llvm/cmake/
+  ${PATH_TO_LLVM}
+  ${PATH_TO_LLVM}/lib/cmake
+  ${PATH_TO_LLVM}/lib/cmake/llvm
+  ${PATH_TO_LLVM}/lib/cmake/clang
+  ${PATH_TO_LLVM}/share/clang/cmake/
+  ${PATH_TO_LLVM}/share/llvm/cmake/
 )
 
 find_package(Clang REQUIRED CONFIG
