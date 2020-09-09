@@ -24,12 +24,12 @@ There are 4 steps, and instructions for each can vary by platform and build syst
 Here's how you would build an index of the lsif-clang tool on Ubuntu 20.04.
 
 ```sh
-apt install llvm-10 clang-10 libclang-10-dev cmake
-git clone https://github.com/sourcegraph/lsif-clang && cd lsif-clang
-cmake -B build
-make -C build -j8
-ln -s $(pwd)/build/compile_commands.json
-./build/bin/lsif-clang --project-root=$(pwd) --executor=all-TUs compile_commands.json > dump.lsif
+apt install llvm-10 clang-10 libclang-10-dev cmake                   `# install dependencies`
+git clone https://github.com/sourcegraph/lsif-clang && cd lsif-clang `# get the code`
+cmake -B build                                                       `# configure lsif-clang`
+make -C build -j8                                                    `# build lsif-clang`
+ln -s $(pwd)/build/compile_commands.json ./                          `# link the compilation database to the project root`
+./build/bin/lsif-clang --project-root=$(pwd) --executor=all-TUs compile_commands.json > dump.lsif `# generate an index`
 ```
 
 The following sections provide detailed explanations of each step and variations on the commands for different platforms and build systems.
