@@ -4,72 +4,129 @@ This project is a fork of [clangd](https://clangd.llvm.org/) with patches to add
 
 This project has only been tested extensively on C++ projects, but C and Objective C projects should both be supported as well following the same instructions.
 
-# Installation
+# Alternatives for C++ Projects
 
-## Dependencies
-
-This project depends on LLVM and Clang. The code builds against LLVM and Clang version 10, but can index a wide variety of code. Please file an issue if you need to build against a different version of LLVM or Clang and we can start adding some version pragmas! You can try finding the location of your llvm installation by running `readlink -f $(which clang)`. On my computer, this returns `/usr/lib/llvm-10/bin/clang`, so the installation path is `/usr/lib/llvm-10`.
-
-## Building
-The project builds with CMake, so if you know what you're doing you can configure it yourself. For sensible defaults:
-
-```sh
-PATH_TO_LLVM=<path> ./config.sh build
-cd build
-make -j8
-sudo make install
-```
-
-`PATH_TO_LLVM` should point to the llvm installation path from the previous step. The `8` in `make -j8` should be the number of threads you wish to allocate to the build (it's fairly small so it shouldn't matter much, but `make` is single threaded by default).
-
-## Give it a whirl!
-
-Assuming you followed the steps above, do the following from this project's root directory:
-
-```sh
-ln -s $(pwd)/build/compile_commands.json ./
-lsif-clang --project-root=$(pwd) --executor=all-TUs compile_commands.json > dump.lsif
-```
-
-Inspect the file when it's done, you should see lots of glorious JSON!
+If you can't get `lsif-clang` working with your project, first file an issue! We want this to work everywhere. 
+But the C++ ecosystem is fragmented, and it's possible that your project simply won't play nice with the `clang` toolchain. 
+[lsif-cpp](https://github.com/sourcegraph/lsif-cpp) is also available, which acts as a plugin for arbitrary C++ compilers and might therefore be compatible. 
+But it has several major defects compared to `lsif-clang` (it is much slower and does not provide hovers), and is not the recommended option.
 
 # Usage
 
-## Compilation Database
+There are 4 steps, and instructions for each can vary by platform and build system.
 
-The tool depends on having a [JSON compilation database](https://clang.llvm.org/docs/JSONCompilationDatabase.html) available, which is generated differently depending on what build system is in use. Please get in touch if you're having trouble generating a compilation database, we'd be happy to help troubleshoot!
+1. Install dependencies
+1. Build lsif-clang
+1. Generate a compilation database.
+1. Run lsif-clang.
+
+## Quick example
+Here's how you would build an index of the lsif-clang tool on Ubuntu 20.04.
+
+```sh
+apt install llvm-10 clang clang-10 libclang-10-dev cmake             `# install dependencies`
+git clone https://github.com/sourcegraph/lsif-clang && cd lsif-clang `# get the code`
+cmake -B build                                                       `# configure lsif-clang`
+make -C build -j8                                                    `# build lsif-clang`
+ln -s $(pwd)/build/compile_commands.json ./                          `# link the compilation database to the project root`
+./build/bin/lsif-clang --project-root=$(pwd) --executor=all-TUs compile_commands.json > dump.lsif `# generate an index`
+```
+
+The following sections provide detailed explanations of each step and variations on the commands for different platforms and build systems.
+
+## Install dependencies
+
+This project depends on LLVM and Clang. lsif-clang itself should be built against LLVM and Clang version 10, and can index any code Clang 10 can compile. Work is ongoing to compile against other versions of LLVM. Here are instructions to get the dependencies on a few platforms:
+
+### Ubuntu 20.04
+
+```sh
+apt install llvm-10 clang clang-10 libclang-10-dev cmake
+```
+
+### MacOS
+
+```sh
+brew install llvm cmake
+```
+
+## Build lsif-clang
+Here is a minimal example, known extra steps for specific platforms follow:
+
+```sh
+cmake -B build
+make -C build -j8
+```
+
+### MacOS
+Add the following extra argument to the `cmake` step:
+```sh
+cmake -B build -DPATH_TO_LLVM=/usr/local/opt/lib
+```
+
+## Generate a compilation database
+
+`lsif-clang` itself is configured to do this automatically, so to test the that the tool built properly you can simply sym-link it to the project root from the build directory and skip to [running lsif-clang]().
+
+From the project root:
+```sh
+ln -s $(pwd)/build/compile_commands.json ./
+```
+
+Instructions for generating this compilation database for various build systems follows:
 
 ### CMake
 
-Add `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON` to your `cmake` invocation. The database will get generated in your build directory, so you should symlink it to the source root.
+If a project builds with CMake, you can ensure that a compilation database is generated in the build directory with the following flag:
+```sh
+cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+```
 
-### Make and others
+For some projects, we've noticed that CMake generates a faulty database, but that the actual build step can output more sensible values. The Ninja build tool provides a convenient mechanism for this. Assuming Ninja is installed:
 
-Install the [Bear](https://github.com/rizsotto/Bear) tool and run `bear make`, or `bear <your-build-command>`. This tool is build system agnostic so it's a good fallback option.
+```sh
+cmake <normal args> -G Ninja
+cd <build dir>
+ninja -t compdb > compile_commands.json
+```
+
+This database will also contain irrelevant entries which will make lsif-clang output quite noisy but still functional. To filter the irrelevant entries, inspect the `compile_commands.json` and find an entry for an actual c++ compile command. Here's an example for me:
+```json
+ {
+  "directory": "/home/arrow/sourcegraph/lsif-clang/build2",
+  "command": "/usr/bin/c++   -I../ -I/usr/lib/llvm-10/include    -std=gnu++17 -o CMakeFiles/clangDaemonFork.dir/AST.cpp.o -c /home/arrow/sourcegraph/lsif-clang/AST.cpp",
+  "file": "/home/arrow/sourcegraph/lsif-clang/AST.cpp"
+}
+```
+
+I can then use the "command" value of `/usr/bin/c++` in the following jq snippet:
+```sh
+ninja -t compdb | jq '[ .[] | select(.command | startswith("/usr/bin/c++")) ] > compile_commands.json'
+```
 
 ### Bazel
 
 Use the [bazel-compilation-database](https://github.com/grailbio/bazel-compilation-database) tool.
 
-## Indexing
+### Make and others
 
-Once you have `compile_commands.json` at the root of your source tree, you can invoke `lsif-clang` like so:
+Install the [Bear](https://github.com/rizsotto/Bear) tool and run `bear make`, or `bear <your-build-command>`. This tool is build system agnostic so it's a good fallback option.
+
+## Run lsif-clang
+
+Once you have a `compile_commands.json` in the root of your project's source, you can use the following command to index the entire project:
 
 ```sh
 lsif-clang --project-root=$(pwd) --executor=all-TUs compile_commands.json > dump.lsif
 ```
 
-This will index the entire project. To index only some files, run:
+To index individual files, use:
 
 ```sh
 lsif-clang --project-root=$(pwd) file1.cpp file2.cpp ... > dump.lsif
 ```
 
-Note that this will still include lots of data about other files to properly supply hovers and such.
-
-### Platform-specific instructions
-
-#### On MacOS
+### MacOS
 
 The indexer may fail to find system header files on MacOS (and possibly other systems) resulting in console error messages such as `fatal error: stdarg.h not found`.
 
@@ -85,6 +142,6 @@ $ lsif-clang \
   compile_commands.json > dump.lsif
 ```
 
-# Alternatives for C++ Projects
+## Test the output
 
-If you can't get `lsif-clang` working with your project, first file an issue! We want this to work everywhere. But the C++ ecosystem is fragmented, and it's possible that your project simply won't play nice with the `clang` toolchain. [lsif-cpp](https://github.com/sourcegraph/lsif-cpp) is also available, which acts as a plugin for arbitrary C++ compilers and might therefore be compatible. But it has several major defects compared to `lsif-clang` (it is much slower and does not provide hovers), and is not the recommended option.
+You can use the [lsif-validate]() tool for basic sanity checking, or [upload the index to a Sourcegraph instance]() to see the hovers, definitions, and references in action.

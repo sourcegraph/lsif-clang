@@ -2,25 +2,30 @@ project(LSIFClang)
 cmake_minimum_required(VERSION 3.16)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-set (search_paths
-  $ENV{PATH_TO_LLVM}
-  $ENV{PATH_TO_LLVM}/lib/cmake
-  $ENV{PATH_TO_LLVM}/lib/cmake/llvm
-  $ENV{PATH_TO_LLVM}/lib/cmake/clang
-  $ENV{PATH_TO_LLVM}/share/clang/cmake/
-  $ENV{PATH_TO_LLVM}/share/llvm/cmake/
-)
+if (PATH_TO_LLVM)
+  set (search_paths
+    ${PATH_TO_LLVM}
+    ${PATH_TO_LLVM}/lib/cmake
+    ${PATH_TO_LLVM}/lib/cmake/llvm
+    ${PATH_TO_LLVM}/lib/cmake/clang
+    ${PATH_TO_LLVM}/share/clang/cmake/
+    ${PATH_TO_LLVM}/share/llvm/cmake/
+  )
+endif()
 
-find_package(LLVM REQUIRED CONFIG
-             PATHS ${search_paths}
-             NO_DEFAULT_PATH)
+message(STATUS "${search_paths}")
+
 find_package(Clang REQUIRED CONFIG
-             PATHS ${search_paths}
-             NO_DEFAULT_PATH)
+             PATHS ${search_paths})
+
+message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+message(STATUS "Using ClangConfig.cmake in: ${CLANG_CMAKE_DIR}")
 
 include_directories(${LLVM_INCLUDE_DIRS})
 
