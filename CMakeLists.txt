@@ -7,14 +7,18 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-set (search_paths
-  ${PATH_TO_LLVM}
-  ${PATH_TO_LLVM}/lib/cmake
-  ${PATH_TO_LLVM}/lib/cmake/llvm
-  ${PATH_TO_LLVM}/lib/cmake/clang
-  ${PATH_TO_LLVM}/share/clang/cmake/
-  ${PATH_TO_LLVM}/share/llvm/cmake/
-)
+if (PATH_TO_LLVM)
+  set (search_paths
+    ${PATH_TO_LLVM}
+    ${PATH_TO_LLVM}/lib/cmake
+    ${PATH_TO_LLVM}/lib/cmake/llvm
+    ${PATH_TO_LLVM}/lib/cmake/clang
+    ${PATH_TO_LLVM}/share/clang/cmake/
+    ${PATH_TO_LLVM}/share/llvm/cmake/
+  )
+endif()
+
+message(STATUS "${search_paths}")
 
 find_package(Clang REQUIRED CONFIG
              PATHS ${search_paths})
