@@ -27,9 +27,9 @@ Here's how you would build an index of the lsif-clang tool on Ubuntu 20.04.
 apt install llvm-10 clang clang-10 libclang-10-dev cmake             `# install dependencies`
 git clone https://github.com/sourcegraph/lsif-clang && cd lsif-clang `# get the code`
 cmake -B build                                                       `# configure lsif-clang`
-make -C build -j8                                                    `# build lsif-clang`
+make -C build -j16 install                                           `# build and install lsif-clang` 
 ln -s $(pwd)/build/compile_commands.json ./                          `# link the compilation database to the project root`
-./build/bin/lsif-clang --project-root=$(pwd) --executor=all-TUs compile_commands.json > dump.lsif `# generate an index`
+lsif-clang --executor=all-TUs compile_commands.json > dump.lsif      `# generate an index`
 ```
 
 The following sections provide detailed explanations of each step and variations on the commands for different platforms and build systems.
@@ -63,7 +63,7 @@ Here is a minimal example, known extra steps for specific platforms follow:
 
 ```sh
 cmake -B build
-make -C build -j8
+make -C build -j16 install
 ```
 
 ### MacOS
@@ -74,7 +74,7 @@ cmake -B build -DPATH_TO_LLVM=/usr/local/opt/lib
 
 ## Generate a compilation database
 
-`lsif-clang` itself is configured to do this automatically, so to test the that the tool built properly you can simply sym-link it to the project root from the build directory and skip to [running lsif-clang]().
+`lsif-clang` itself is configured to do this automatically, so to test the that the tool built properly you can simply sym-link it to the project root from the build directory and skip to [running lsif-clang](#run-lsif-clang).
 
 From the project root:
 ```sh
@@ -116,22 +116,22 @@ ninja -t compdb | jq '[ .[] | select(.command | startswith("/usr/bin/c++")) ] > 
 
 Use the [bazel-compilation-database](https://github.com/grailbio/bazel-compilation-database) tool.
 
-### Make and others
+### If all else fails
 
-Install the [Bear](https://github.com/rizsotto/Bear) tool and run `bear make`, or `bear <your-build-command>`. This tool is build system agnostic so it's a good fallback option.
+Install the [Bear](https://github.com/rizsotto/Bear) tool and run `bear make`, or `bear <your-build-command>`. This will intercept the actual commands used to build your project and generate a compilation database from them. This is a last resort as it requires you to compile your entire project from scratch before compiling it a second time with `lsif-clang`, which can take quite a while.
 
 ## Run lsif-clang
 
 Once you have a `compile_commands.json` in the root of your project's source, you can use the following command to index the entire project:
 
 ```sh
-lsif-clang --project-root=$(pwd) --executor=all-TUs compile_commands.json > dump.lsif
+lsif-clang --executor=all-TUs compile_commands.json > dump.lsif
 ```
 
 To index individual files, use:
 
 ```sh
-lsif-clang --project-root=$(pwd) file1.cpp file2.cpp ... > dump.lsif
+lsif-clang file1.cpp file2.cpp ... > dump.lsif
 ```
 
 ### MacOS
@@ -152,4 +152,4 @@ $ lsif-clang \
 
 ## Test the output
 
-You can use the [lsif-validate]() tool for basic sanity checking, or [upload the index to a Sourcegraph instance]() to see the hovers, definitions, and references in action.
+You can use the [lsif-validate](https://github.com/sourcegraph/lsif-test) tool for basic sanity checking, or [upload the index to a Sourcegraph instance](https://docs.sourcegraph.com/user/code_intelligence/lsif_quickstart) to see the hovers, definitions, and references in action.

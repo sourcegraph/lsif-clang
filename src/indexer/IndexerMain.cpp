@@ -24,10 +24,8 @@
 #include "clang/Tooling/Tooling.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/Signals.h"
-
-namespace clang {
-namespace clangd {
-namespace {
+#include <llvm-10/llvm/ADT/SmallVector.h>
+#include <llvm-10/llvm/Support/FileSystem.h>
 
 // static llvm::cl::opt<IndexFileFormat> Format(
 //     "format", llvm::cl::desc("Format of the index to be written"),
@@ -46,12 +44,12 @@ static llvm::cl::opt<bool> Debug(
     llvm::cl::desc("Enable verbose debug output."),
     llvm::cl::init(false));
 
-class IndexActionFactory : public tooling::FrontendActionFactory {
+class IndexActionFactory : public clang::tooling::FrontendActionFactory {
 public:
-  IndexActionFactory(IndexFileIn &Result) : Result(Result) {}
+  IndexActionFactory(clang::clangd::IndexFileIn &Result) : Result(Result) {}
 
-  std::unique_ptr<FrontendAction> create() override {
-    SymbolCollector::Options Opts;
+  std::unique_ptr<clang::FrontendAction> create() override {
+    clang::clangd::SymbolCollector::Options Opts;
     Opts.CountReferences = true;
     Opts.CollectMainFileSymbols = true;
     Opts.StoreAllDocumentation = true;
@@ -60,11 +58,11 @@ public:
     IndexOpts.IndexParametersInDeclarations = true;
     IndexOpts.IndexImplicitInstantiation = true;
     IndexOpts.IndexMacrosInPreprocessor = true;
-    IndexOpts.SystemSymbolFilter = index::IndexingOptions::SystemSymbolFilterKind::All;
+    IndexOpts.SystemSymbolFilter = clang::index::IndexingOptions::SystemSymbolFilterKind::All;
     return createStaticIndexingAction(
         Opts,
         IndexOpts,
-        [&](SymbolSlab S) {
+        [&](clang::clangd::SymbolSlab S) {
           // Merge as we go.
           std::lock_guard<std::mutex> Lock(SymbolsMu);
           for (const auto &Sym : S) {
@@ -74,7 +72,7 @@ public:
               Symbols.insert(Sym);
           }
         },
-        [&](RefSlab S) {
+        [&](clang::clangd::RefSlab S) {
           std::lock_guard<std::mutex> Lock(SymbolsMu);
           for (const auto &Sym : S) {
             // Deduplication happens during insertion.
@@ -82,7 +80,7 @@ public:
               Refs.insert(Sym.first, Ref);
           }
         },
-        [&](RelationSlab S) {
+        [&](clang::clangd::RelationSlab S) {
           std::lock_guard<std::mutex> Lock(SymbolsMu);
           for (const auto &R : S) {
             Relations.insert(R);
@@ -100,16 +98,12 @@ public:
   }
 
 private:
-  IndexFileIn &Result;
+  clang::clangd::IndexFileIn &Result;
   std::mutex SymbolsMu;
-  SymbolSlab::Builder Symbols;
-  RefSlab::Builder Refs;
-  RelationSlab::Builder Relations;
+  clang::clangd::SymbolSlab::Builder Symbols;
+  clang::clangd::RefSlab::Builder Refs;
+  clang::clangd::RelationSlab::Builder Relations;
 };
-
-} // namespace
-} // namespace clangd
-} // namespace clang
 
 int main(int argc, const char **argv) {
   llvm::sys::PrintStackTraceOnErrorSignal(argv[0]);
@@ -119,11 +113,11 @@ int main(int argc, const char **argv) {
 
   Example usage for a project using CMake compile commands:
 
-  $ clangd-indexer --executor=all-TUs compile_commands.json > clangd.dex
+  $ lsif-clang --executor=all-TUs compile_commands.json > clangd.dex
 
   Example usage for file sequence index without flags:
 
-  $ clangd-indexer File1.cpp File2.cpp ... FileN.cpp > clangd.dex
+  $ lsif-clang File1.cpp File2.cpp ... FileN.cpp > clangd.dex
   )";
 
   auto Executor = clang::tooling::createExecutorFromCommandLineArgs(
@@ -137,7 +131,7 @@ int main(int argc, const char **argv) {
   // Collect symbols found in each translation unit, merging as we go.
   clang::clangd::IndexFileIn Data;
   auto Err = Executor->get()->execute(
-      std::make_unique<clang::clangd::IndexActionFactory>(Data),
+      std::make_unique<IndexActionFactory>(Data),
       clang::tooling::getStripPluginsAdjuster());
   if (Err) {
     llvm::errs() << llvm::toString(std::move(Err)) << "\n";
@@ -146,8 +140,14 @@ int main(int argc, const char **argv) {
   // Emit collected data.
   clang::clangd::IndexFileOut Out(Data);
   Out.Format = clang::clangd::IndexFileFormat::LSIF;
-  Out.ProjectRoot = "file://" + clang::clangd::ProjectRoot;
-  Out.Debug = clang::clangd::Debug;
+  if (ProjectRoot == "") {
+    llvm::SmallString<128> CurrentPath;
+    llvm::sys::fs::current_path(CurrentPath);
+    Out.ProjectRoot = std::string("file://") + CurrentPath.c_str();
+  } else {
+    Out.ProjectRoot = ProjectRoot;
+  }
+  Out.Debug = Debug;
   writeLSIF(Out, llvm::outs());
   return 0;
 }
