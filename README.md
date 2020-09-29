@@ -38,11 +38,19 @@ The following sections provide detailed explanations of each step and variations
 
 This project depends on LLVM and Clang. lsif-clang itself should be built against LLVM and Clang version 10, and can index any code Clang 10 can compile. Work is ongoing to compile against other versions of LLVM. Here are instructions to get the dependencies on a few platforms:
 
-### Ubuntu 20.04
+### Ubuntu (20.04)
 
 ```sh
 apt install llvm-10 clang clang-10 libclang-10-dev cmake
 ```
+
+#### Older versions of Ubuntu
+
+CMake version 3.16 or later is required (we've tested with CMake version 3.18.0). On older versions
+of Ubuntu, `apt` may not install a recent enough version of CMake. You can install CMake manually
+following the instructions here: https://cmake.org/download. We've tested this works on Ubuntu
+18.04. On even older versions of Ubuntu, you may have to manually install other dependencies if they
+don't exist in the `apt` package repository.
 
 ### MacOS
 
