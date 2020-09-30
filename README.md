@@ -29,8 +29,7 @@ git clone https://github.com/sourcegraph/lsif-clang       `# get the code`
 cd lsif-clang
 cmake -B build                                            `# configure lsif-clang`
 make -C build -j16 install                                `# build and install lsif-clang` 
-ln -s $(pwd)/build/compile_commands.json ./               `# link the compilation database to the project root`
-lsif-clang compile_commands.json > dump.lsif              `# generate an index`
+lsif-clang build/compile_commands.json                    `# generate an index`
 ```
 
 The following sections provide detailed explanations of each step and variations on the commands for different platforms and build systems.
@@ -126,13 +125,7 @@ Install the [Bear](https://github.com/rizsotto/Bear) tool and run `bear make`, o
 Once you have a `compile_commands.json` in the root of your project's source, you can use the following command to index the entire project:
 
 ```sh
-lsif-clang compile_commands.json > dump.lsif
-```
-
-To index individual files, use:
-
-```sh
-lsif-clang file1.cpp file2.cpp ... > dump.lsif
+lsif-clang compile_commands.json
 ```
 
 ### MacOS
@@ -147,7 +140,7 @@ $ clang -print-resource-dir
 
 $ lsif-clang \
   --extra-arg='-resource-dir=/Library/Developer/CommandLineTools/usr/lib/clang/11.0.3' \
-  compile_commands.json > dump.lsif
+  compile_commands.json
 ```
 
 ## Test the output
