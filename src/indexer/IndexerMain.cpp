@@ -26,7 +26,11 @@
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/Signals.h"
 #include <llvm-10/llvm/ADT/SmallVector.h>
+#include <llvm-10/llvm/Support/Error.h>
+#include <llvm-10/llvm/Support/ErrorHandling.h>
 #include <llvm-10/llvm/Support/FileSystem.h>
+#include <llvm-10/llvm/Support/raw_ostream.h>
+#include <system_error>
 
 using namespace clang::tooling;
 using namespace llvm;
@@ -39,8 +43,12 @@ static cl::OptionCategory LSIFClangCategory("lsif-clang", R"(
 
 static cl::opt<std::string> ProjectRoot(
     "project-root",
-    cl::desc("Absolute path to root directory of project being indexed"),
+    cl::desc("Absolute path to root directory of project being indexed."),
     cl::init(""), cl::cat(LSIFClangCategory));
+
+static cl::opt<std::string>
+    IndexDestination("out", cl::desc("Destination of resulting LSIF index."),
+                     cl::init("dump.lsif"), cl::cat(LSIFClangCategory));
 
 static cl::opt<bool> Debug("debug", cl::desc("Enable verbose debug output."),
                            cl::init(false), cl::cat(LSIFClangCategory));
@@ -136,6 +144,15 @@ int main(int argc, const char **argv) {
     Out.ProjectRoot = ProjectRoot;
   }
   Out.Debug = Debug;
-  writeLSIF(Out, outs());
+  if (!IndexDestination.empty()) {
+    std::error_code FileErr;
+    raw_fd_ostream IndexOstream(IndexDestination, FileErr);
+    if (FileErr.value() != 0) {
+      report_fatal_error(FileErr.message());
+    }
+    writeLSIF(Out, IndexOstream);
+  } else {
+    writeLSIF(Out, outs());
+  }
   return 0;
 }
