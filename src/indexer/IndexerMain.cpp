@@ -18,6 +18,7 @@
 #include "index/Symbol.h"
 #include "index/SymbolCollector.h"
 #include "clang/Index/IndexingOptions.h"
+#include "clang/Tooling/AllTUsExecution.h"
 #include "clang/Tooling/ArgumentsAdjusters.h"
 #include "clang/Tooling/CommonOptionsParser.h"
 #include "clang/Tooling/Execution.h"
@@ -27,24 +28,24 @@
 #include <llvm-10/llvm/ADT/SmallVector.h>
 #include <llvm-10/llvm/Support/FileSystem.h>
 
-// static llvm::cl::opt<IndexFileFormat> Format(
-//     "format", llvm::cl::desc("Format of the index to be written"),
-//     llvm::cl::values(
-//         clEnumValN(IndexFileFormat::YAML, "yaml", "human-readable YAML format"),
-//         clEnumValN(IndexFileFormat::RIFF, "binary", "binary RIFF format"),
-//         clEnumValN(IndexFileFormat::LSIF, "lsif", "exportable LSIF format")),
-//     llvm::cl::init(IndexFileFormat::RIFF));
+using namespace clang::tooling;
+using namespace llvm;
 
-static llvm::cl::opt<std::string> ProjectRoot(
-    "project-root", llvm::cl::desc("Absolute path to root directory of project being indexed"),
-    llvm::cl::init(""));
+static cl::OptionCategory LSIFClangCategory("lsif-clang", R"(
+  Creates an LSIF index of an entire project based on a JSON compilation database.
 
-static llvm::cl::opt<bool> Debug(
-    "debug",
-    llvm::cl::desc("Enable verbose debug output."),
-    llvm::cl::init(false));
+  $ lsif-clang compile_commands.json > dump.lsif
+  )");
 
-class IndexActionFactory : public clang::tooling::FrontendActionFactory {
+static cl::opt<std::string> ProjectRoot(
+    "project-root",
+    cl::desc("Absolute path to root directory of project being indexed"),
+    cl::init(""), cl::cat(LSIFClangCategory));
+
+static cl::opt<bool> Debug("debug", cl::desc("Enable verbose debug output."),
+                           cl::init(false), cl::cat(LSIFClangCategory));
+
+class IndexActionFactory : public FrontendActionFactory {
 public:
   IndexActionFactory(clang::clangd::IndexFileIn &Result) : Result(Result) {}
 
@@ -58,10 +59,10 @@ public:
     IndexOpts.IndexParametersInDeclarations = true;
     IndexOpts.IndexImplicitInstantiation = true;
     IndexOpts.IndexMacrosInPreprocessor = true;
-    IndexOpts.SystemSymbolFilter = clang::index::IndexingOptions::SystemSymbolFilterKind::All;
+    IndexOpts.SystemSymbolFilter =
+        clang::index::IndexingOptions::SystemSymbolFilterKind::All;
     return createStaticIndexingAction(
-        Opts,
-        IndexOpts,
+        Opts, IndexOpts,
         [&](clang::clangd::SymbolSlab S) {
           // Merge as we go.
           std::lock_guard<std::mutex> Lock(SymbolsMu);
@@ -106,48 +107,35 @@ private:
 };
 
 int main(int argc, const char **argv) {
-  llvm::sys::PrintStackTraceOnErrorSignal(argv[0]);
+  sys::PrintStackTraceOnErrorSignal(argv[0]);
 
-  const char *Overview = R"(
-  Creates an index of symbol information etc in a whole project.
+  CommonOptionsParser OptionsParser(argc, argv, LSIFClangCategory,
+                                    cl::OneOrMore);
 
-  Example usage for a project using CMake compile commands:
+  AllTUsToolExecutor Executor(OptionsParser.getCompilations(), 0);
 
-  $ lsif-clang --executor=all-TUs compile_commands.json > clangd.dex
-
-  Example usage for file sequence index without flags:
-
-  $ lsif-clang File1.cpp File2.cpp ... FileN.cpp > clangd.dex
-  )";
-
-  auto Executor = clang::tooling::createExecutorFromCommandLineArgs(
-      argc, argv, llvm::cl::GeneralCategory, Overview);
-
-  if (!Executor) {
-    llvm::errs() << llvm::toString(Executor.takeError()) << "\n";
-    return 1;
-  }
+  ArgumentsAdjuster Adjuster = combineAdjusters(
+      OptionsParser.getArgumentsAdjuster(),
+      getInsertArgumentAdjuster("-Wno-unknown-warning-option"));
 
   // Collect symbols found in each translation unit, merging as we go.
   clang::clangd::IndexFileIn Data;
-  auto Err = Executor->get()->execute(
-      std::make_unique<IndexActionFactory>(Data),
-      clang::tooling::getStripPluginsAdjuster());
+  auto Err =
+      Executor.execute(std::make_unique<IndexActionFactory>(Data), Adjuster);
   if (Err) {
-    llvm::errs() << llvm::toString(std::move(Err)) << "\n";
   }
 
   // Emit collected data.
   clang::clangd::IndexFileOut Out(Data);
   Out.Format = clang::clangd::IndexFileFormat::LSIF;
   if (ProjectRoot == "") {
-    llvm::SmallString<128> CurrentPath;
-    llvm::sys::fs::current_path(CurrentPath);
+    SmallString<128> CurrentPath;
+    sys::fs::current_path(CurrentPath);
     Out.ProjectRoot = std::string("file://") + CurrentPath.c_str();
   } else {
     Out.ProjectRoot = ProjectRoot;
   }
   Out.Debug = Debug;
-  writeLSIF(Out, llvm::outs());
+  writeLSIF(Out, outs());
   return 0;
 }
