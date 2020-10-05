@@ -15,7 +15,7 @@ Unfortunately, it has several major defects compared to `lsif-clang` (it is much
 
 # Usage
 
-Follow the [installation instructions](docs/installation.md) to get the tool set up, then the [compilation database](docs/compdb.md) instructions to generate a compilation database. Then run
+Follow the [installation instructions](docs/install.md) to get the tool set up, then the [compilation database](docs/compdb.md) instructions to generate a compilation database. Then run
 ```sh
 lsif-clang compile_commands.json
 ```
