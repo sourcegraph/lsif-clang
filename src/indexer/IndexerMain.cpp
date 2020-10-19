@@ -41,17 +41,17 @@ static cl::OptionCategory LSIFClangCategory("lsif-clang", R"(
   $ lsif-clang compile_commands.json > dump.lsif
   )");
 
-static cl::opt<std::string> ProjectRoot(
+static cl::opt<std::string> ProjectRootArg(
     "project-root",
     cl::desc("Absolute path to root directory of project being indexed."),
     cl::init(""), cl::cat(LSIFClangCategory));
 
 static cl::opt<std::string>
-    IndexDestination("out", cl::desc("Destination of resulting LSIF index."),
-                     cl::init("dump.lsif"), cl::cat(LSIFClangCategory));
+    IndexDestinationArg("out", cl::desc("Destination of resulting LSIF index."),
+                        cl::init("dump.lsif"), cl::cat(LSIFClangCategory));
 
-static cl::opt<bool> Debug("debug", cl::desc("Enable verbose debug output."),
-                           cl::init(false), cl::cat(LSIFClangCategory));
+static cl::opt<bool> DebugArg("debug", cl::desc("Enable verbose debug output."),
+                              cl::init(false), cl::cat(LSIFClangCategory));
 
 class IndexActionFactory : public FrontendActionFactory {
 public:
@@ -120,7 +120,15 @@ int main(int argc, const char **argv) {
   CommonOptionsParser OptionsParser(argc, argv, LSIFClangCategory,
                                     cl::OneOrMore);
 
-  AllTUsToolExecutor Executor(OptionsParser.getCompilations(), 0);
+  std::string ProjectRoot = ProjectRootArg;
+  if (ProjectRoot == "") {
+    SmallString<128> CurrentPath;
+    sys::fs::current_path(CurrentPath);
+    ProjectRoot = std::string("file://") + CurrentPath.c_str();
+  }
+  if (DebugArg) {
+    llvm::errs() << "Using project root " << ProjectRoot << "\n";
+  }
 
   ArgumentsAdjuster Adjuster = combineAdjusters(
       OptionsParser.getArgumentsAdjuster(),
@@ -128,6 +136,8 @@ int main(int argc, const char **argv) {
 
   // Collect symbols found in each translation unit, merging as we go.
   clang::clangd::IndexFileIn Data;
+
+  AllTUsToolExecutor Executor(OptionsParser.getCompilations(), 0);
   auto Err =
       Executor.execute(std::make_unique<IndexActionFactory>(Data), Adjuster);
   if (Err) {
@@ -136,17 +146,11 @@ int main(int argc, const char **argv) {
   // Emit collected data.
   clang::clangd::IndexFileOut Out(Data);
   Out.Format = clang::clangd::IndexFileFormat::LSIF;
-  if (ProjectRoot == "") {
-    SmallString<128> CurrentPath;
-    sys::fs::current_path(CurrentPath);
-    Out.ProjectRoot = std::string("file://") + CurrentPath.c_str();
-  } else {
-    Out.ProjectRoot = ProjectRoot;
-  }
-  Out.Debug = Debug;
-  if (!IndexDestination.empty()) {
+  Out.Debug = DebugArg;
+  Out.ProjectRoot = ProjectRoot;
+  if (!IndexDestinationArg.empty()) {
     std::error_code FileErr;
-    raw_fd_ostream IndexOstream(IndexDestination, FileErr);
+    raw_fd_ostream IndexOstream(IndexDestinationArg, FileErr);
     if (FileErr.value() != 0) {
       report_fatal_error(FileErr.message());
     }

@@ -76,9 +76,6 @@ struct LSIFMeta {
 
   bool contains(const char *FileURI) {
     bool contains = FileURI && llvm::StringRef(FileURI).startswith(ProjectRoot);
-    if (Debug && !contains) {
-      llvm::errs() << "debug: Excluding file " << FileURI << " from project " << ProjectRoot << "\n";
-    }
     return contains;
   }
 };
