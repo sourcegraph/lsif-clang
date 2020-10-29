@@ -34,3 +34,23 @@ Add the following extra argument to the `cmake` step:
 ```sh
 cmake -B build -DPATH_TO_LLVM=/usr/local/opt/lib
 ```
+
+If you encounter the following error:
+
+```
+Could not find a package configuration file provided by "Clang" with any of the following names:
+
+	ClangConfig.cmake
+	clang-config.cmake
+```
+
+then, do the following:
+
+1. Find the path to `ClangConfig.cmake`:
+   ```
+   find /usr/ -name ClangConfig.cmake
+   ```
+1. Set the *containing directory* of the first result as the value for `Clang_DIR` in the following command:
+   ```
+   Clang_DIR=/path/to/containing/dir cmake -B build -DPATH_TO_LLVM=/usr/local/opt/lib
+   ```
