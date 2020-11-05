@@ -23,13 +23,13 @@
 #include "clang/Tooling/CommonOptionsParser.h"
 #include "clang/Tooling/Execution.h"
 #include "clang/Tooling/Tooling.h"
+#include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/CommandLine.h"
+#include "llvm/Support/Error.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Signals.h"
-#include <llvm-10/llvm/ADT/SmallVector.h>
-#include <llvm-10/llvm/Support/Error.h>
-#include <llvm-10/llvm/Support/ErrorHandling.h>
-#include <llvm-10/llvm/Support/FileSystem.h>
-#include <llvm-10/llvm/Support/raw_ostream.h>
+#include "llvm/Support/raw_ostream.h"
 #include <system_error>
 
 using namespace clang::tooling;
