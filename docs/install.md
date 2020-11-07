@@ -42,6 +42,8 @@ make -C build -j8  # the -j argument sets the parallelism level
 sudo make -C build install
 ```
 
+Immediately after installing, you should run `lsif-clang`. If you encounter an error like "libLLVM.dylib cannot be opened because the developer cannot be verified", open **System Preferences > Security & Privacy > General** and click **Open Anyway** next to the message "libLLVM.dylib was blocked from use because it is not from an identified developer". Run `lsif-clang` again and click the **Open** button in the system dialog that pops up.
+
 If you did not install LLVM 10 with Homebrew, you may need to modify the values of `Clang_DIR` and
 `-DPATH_TO_LLVM`. If you encounter the following error:
 
