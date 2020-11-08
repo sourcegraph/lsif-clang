@@ -20,9 +20,6 @@ ENV SRC_ENDPOINT="https://sourcegraph.com"
 RUN curl -L https://sourcegraph.com/.api/src-cli/src_linux_amd64 -o /usr/local/bin/src
 RUN chmod +x /usr/local/bin/src
 
-# Install Bear
-RUN apt-get install -y bear
-
 # Install build dependencies that do not change from revision to revision
 RUN mkdir -p /sh
 COPY ./install_build_deps.sh /sh/install_build_deps.sh

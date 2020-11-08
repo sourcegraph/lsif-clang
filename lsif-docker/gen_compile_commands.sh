@@ -4,7 +4,4 @@ set -eux
 
 cd /source
 
-mkdir -p /install
-./autogen.sh
-./configure --prefix=/install
-bear make
+echo "Update gen_compile_commands.sh to generate a compilation database (compile_commands.json) file."
