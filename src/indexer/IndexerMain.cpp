@@ -32,6 +32,12 @@
 #include "llvm/Support/raw_ostream.h"
 #include <system_error>
 
+#include <stdio.h>
+#include <execinfo.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <unistd.h>
+
 using namespace clang::tooling;
 using namespace llvm;
 
@@ -114,7 +120,40 @@ private:
   clang::clangd::RelationSlab::Builder Relations;
 };
 
+void handler(int sig) {
+  void *array[10];
+  size_t size;
+
+  size = backtrace(array, 10);
+  // print out all the frames to stderr
+  fprintf(stderr, "Error: signal %d:\n", sig);
+  backtrace_symbols_fd(array, size, STDERR_FILENO);
+  exit(1);
+}
+
+void baz() {
+ int *foo = (int*)-1; // make a bad pointer
+  printf("%d\n", *foo);       // causes segfault
+}
+
+void bar() { baz(); }
+void foo() { bar(); }
+
+
 int main(int argc, const char **argv) {
+  signal(SIGSEGV, handler);   // install our handler
+  // Segfault!
+  foo();
+
+
+
+
+
+
+
+
+
+
   sys::PrintStackTraceOnErrorSignal(argv[0]);
 
   CommonOptionsParser OptionsParser(argc, argv, LSIFClangCategory,
