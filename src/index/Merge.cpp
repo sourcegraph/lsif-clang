@@ -12,7 +12,6 @@
 #include "index/Symbol.h"
 #include "index/SymbolLocation.h"
 #include "index/SymbolOrigin.h"
-#include "clang/AST/Stmt.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/StringSet.h"
