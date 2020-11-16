@@ -55,7 +55,7 @@ static cl::opt<bool> DebugArg("debug", cl::desc("Enable verbose debug output."),
 
 class IndexActionFactory : public FrontendActionFactory {
 public:
-  IndexActionFactory(clang::clangd::IndexFileIn &Result) : Result(Result) {}
+  IndexActionFactory(clang::clangd::IndexFileIn &Result, std::string &ProjectRoot) : Result(Result), ProjectRoot(ProjectRoot) {}
 
   std::unique_ptr<clang::FrontendAction> create() override {
     clang::clangd::SymbolCollector::Options Opts;
@@ -76,7 +76,7 @@ public:
           std::lock_guard<std::mutex> Lock(SymbolsMu);
           for (const auto &Sym : S) {
             if (const auto *Existing = Symbols.find(Sym.ID))
-              Symbols.insert(mergeSymbol(*Existing, Sym));
+              Symbols.insert(mergeSymbol(*Existing, Sym, ProjectRoot));
             else
               Symbols.insert(Sym);
           }
@@ -112,6 +112,7 @@ private:
   clang::clangd::SymbolSlab::Builder Symbols;
   clang::clangd::RefSlab::Builder Refs;
   clang::clangd::RelationSlab::Builder Relations;
+  std::string &ProjectRoot;
 };
 
 int main(int argc, const char **argv) {
@@ -141,7 +142,7 @@ int main(int argc, const char **argv) {
 
   AllTUsToolExecutor Executor(OptionsParser.getCompilations(), 0);
   auto Err =
-      Executor.execute(std::make_unique<IndexActionFactory>(Data), Adjuster);
+    Executor.execute(std::make_unique<IndexActionFactory>(Data, ProjectRoot), Adjuster);
   if (Err) {
   }
 
