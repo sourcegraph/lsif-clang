@@ -1,0 +1,27 @@
+{
+    "name": "lsif-clang ubuntu 20.04",
+    "dockerFile": "Dockerfile",
+    "settings": {
+        "[cpp]": {
+            "editor.tabSize": 2,
+            "editor.insertSpaces": true
+        },
+        // preference :) change if undesired
+        "terminal.integrated.shell.linux": "/usr/bin/fish"
+    },
+    // recommended extensions, configure as you wish
+    "extensions": [
+        "ms-vscode.cpptools",
+        "llvm-vs-code-extensions.vscode-clangd",
+        "ms-vscode.cmake-tools",
+        "vadimcn.vscode-lldb",
+        "buster.ndjson-colorizer", // for highlighting dump.lsif files
+        "wayou.vscode-todo-highlight",
+        "eamodio.gitlens",
+        "twxs.cmake",
+        "bazelbuild.vscode-bazel" // make life a bit nicer if working with bazel repos
+    ],
+    // set the local SG_LSIFCLANG env var to point to the folder containing the lsif-clang repo
+    "mounts": ["source=${localEnv:SG_LSIFCLANG},target=/workspace/lsif-clang,type=bind,consistency=cached"],
+    "workspaceFolder": "/workspace/lsif-clang"
+}
