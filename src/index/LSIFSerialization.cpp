@@ -254,8 +254,13 @@ void writeHoverResult(LSIFMeta &Meta, const clang::clangd::Symbol &Sym,
 
           JSONOut.attribute("value", OHover.str());
         });
-        if (Sym.Documentation.data() && !Sym.Documentation.empty())
-          JSONOut.value(Sym.Documentation);
+        if (Sym.Documentation.data() && !Sym.Documentation.empty()) {
+          auto docString = Sym.Documentation;
+          if(!llvm::json::isUTF8(docString)) {
+            docString = llvm::StringRef(llvm::json::fixUTF8(Sym.Documentation));
+          }
+          JSONOut.value(docString);
+        }
       });
     });
   });
