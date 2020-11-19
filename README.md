@@ -1,6 +1,6 @@
 # lsif-clang indexer ![Status: Development](https://img.shields.io/badge/status-beta-yellow?style=flat)
 
-![GIF displaying usage on the linux kernel.](docs/gifs/torvalds-linux.gif)
+![GIF displaying usage on the linux kernel.](docs/images/torvalds-linux.gif)
 
 This project is a fork of [clangd](https://clangd.llvm.org/) with patches to add support for outputting [LSIF indexes](https://microsoft.github.io/language-server-protocol/specifications/lsif/0.5.0/specification/). Specifically, a fork of the `clang-tools-extra/clangd` subdirectory of the [llvm-project repo](https://github.com/llvm/llvm-project/).
 
