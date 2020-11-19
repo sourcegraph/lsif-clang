@@ -1,8 +1,13 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../)
 
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/backward-cpp)
+
 add_executable(lsif-clang
-  IndexerMain.cpp
-  )
+    IndexerMain.cpp
+    ${BACKWARD_ENABLE}
+)
+
+add_backward(lsif-clang)
 
 install(TARGETS lsif-clang)
 

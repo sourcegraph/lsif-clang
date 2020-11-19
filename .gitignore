@@ -6,3 +6,6 @@ valgrind*
 bin
 build
 cmake-build-debug*
+.clangd
+compile_commands.json
+dump.lsif
