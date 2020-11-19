@@ -32,6 +32,8 @@
 #include "llvm/Support/raw_ostream.h"
 #include <system_error>
 
+#define BACKWARD_HAS_DWARF 1
+
 using namespace clang::tooling;
 using namespace llvm;
 
@@ -116,7 +118,7 @@ private:
 };
 
 int main(int argc, const char **argv) {
-  sys::PrintStackTraceOnErrorSignal(argv[0]);
+  //sys::PrintStackTraceOnErrorSignal(argv[0]);
 
   CommonOptionsParser OptionsParser(argc, argv, LSIFClangCategory,
                                     cl::OneOrMore);
