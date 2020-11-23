@@ -5,7 +5,7 @@ This project depends on LLVM and Clang. lsif-clang itself should be built agains
 ### Ubuntu (20.04)
 
 ```sh
-apt install llvm-10 clang clang-10 libclang-10-dev cmake
+apt install llvm-10 clang clang-10 libclang-10-dev cmake binutils-dev
 ```
 
 #### Older versions of Ubuntu
@@ -19,7 +19,7 @@ don't exist in the `apt` package repository.
 ### MacOS
 
 ```sh
-brew install cmake sourcegraph/brew/llvm@10
+brew install cmake sourcegraph/brew/llvm@10 binutils
 ```
 
 > Note: lsif-clang must currently be built using LLVM 10
