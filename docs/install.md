@@ -26,6 +26,8 @@ brew install cmake sourcegraph/brew/llvm@10 binutils
 
 # Installation
 
+Make sure to checkout any submodules, either with `git clone --recurse-submodules ...` or `git submodule update --init --recursive`
+
 ### Ubuntu
 
 ```sh
