@@ -36,11 +36,11 @@ http_archive(
 ```
 
 Then you can run:
-```
+```bash
 bazel build \
   --aspects=@bazel_compdb//:aspects.bzl%compilation_database_aspect \
-  --output_groups=compdb_files,header_files  `# this should include any generated outputs needed for cpp compilation` \
-  $(bazel query 'kind("cc_(library|binary|test|inc_library|proto_library)", //...)')'
+  --output_groups=compdb_files,header_files \ # this should include any generated outputs needed for cpp compilation
+  $(bazel query 'kind("cc_(library|binary|test|inc_library|proto_library)", //...)')
 ```
 The bazel query might look different for your project.
 

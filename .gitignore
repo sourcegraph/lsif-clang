@@ -1,0 +1,8 @@
+massif.out.*
+vgcore.*
+valgrind*
+.clangd
+.cache
+bin
+build
+cmake-build-debug
