@@ -6,13 +6,14 @@ on:
       - llvmorg-10.0.0-lsif-clang
 
 jobs:
-  goreleaser:
+  release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Unshallow
         run: git fetch --prune --unshallow && git submodule update --init --recursive
+      - uses: docker/setup-buildx-action@v1
       - name: Docker login
         uses: docker/login-action@v1
         with:
