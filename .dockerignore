@@ -1,0 +1,5 @@
+massif.out.*
+.vscode
+.devcontainer
+build/
+bin/
