@@ -5,4 +5,4 @@ valgrind*
 .cache
 bin
 build
-cmake-build-debug
+cmake-build-debug*
