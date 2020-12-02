@@ -3,7 +3,7 @@ name: release
 on:
   push:
     branches:
-      - llvm-10.0.0-lsif-clang
+      - llvmorg-10.0.0-lsif-clang
 
 jobs:
   goreleaser:
