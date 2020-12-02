@@ -10,7 +10,7 @@ RUN cmake -B build && make -C build -j$(nproc)
 
 FROM ubuntu:20.04
 
-RUN apt update && apt install -y llvm-10 cmake
+RUN apt update && apt install -y libllvm10 cmake
 
 COPY --from=build /lsif-clang/bin/lsif-clang /usr/local/bin/lsif-clang
 
