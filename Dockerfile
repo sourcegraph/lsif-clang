@@ -6,7 +6,7 @@ WORKDIR /lsif-clang
 
 COPY . .
 
-RUN cmake -B build && make -C build -j$(nproc)
+RUN CC=clang-10 CXX=clang-10 cmake -B build && make -C build -j$(nproc)
 
 FROM ubuntu:20.10
 
