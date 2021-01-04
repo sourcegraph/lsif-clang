@@ -1,4 +1,4 @@
-# lsif-clang indexer ![Status: Development](https://img.shields.io/badge/status-development-yellow?style=flat)
+# lsif-clang indexer ![Status: Development](https://img.shields.io/badge/status-beta-yellow?style=flat)
 
 ![GIF displaying usage on the linux kernel.](docs/gifs/torvalds-linux.gif)
 
