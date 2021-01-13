@@ -140,7 +140,11 @@ int main(int argc, const char **argv) {
   // Collect symbols found in each translation unit, merging as we go.
   clang::clangd::IndexFileIn Data;
 
-  AllTUsToolExecutor Executor(OptionsParser.getCompilations(), 0);
+  auto& compilations = OptionsParser.getCompilations();
+  if (compilations.getAllFiles().size() == 0) {
+    exit(1);
+  }
+  AllTUsToolExecutor Executor(compilations, 0);
   auto Err =
     Executor.execute(std::make_unique<IndexActionFactory>(Data, ProjectRoot), Adjuster);
   if (Err) {
