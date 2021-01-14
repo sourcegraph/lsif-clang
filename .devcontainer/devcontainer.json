@@ -19,9 +19,12 @@
         "wayou.vscode-todo-highlight",
         "eamodio.gitlens",
         "twxs.cmake",
-        "bazelbuild.vscode-bazel" // make life a bit nicer if working with bazel repos
+        "bazelbuild.vscode-bazel", // make life a bit nicer if working with bazel repos
+        "ms-azuretools.vscode-docker"
     ],
-    // set the local SG_LSIFCLANG env var to point to the folder containing the lsif-clang repo
-    "mounts": ["source=${localEnv:SG_LSIFCLANG},target=/workspace/lsif-clang,type=bind,consistency=cached"],
-    "workspaceFolder": "/workspace/lsif-clang"
+    "mounts": [
+        "source=/var/run/docker.sock,target=/var/run/docker-host.sock,type=bind"
+    ],
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=delegated",
+    "workspaceFolder": "/workspace"
 }
