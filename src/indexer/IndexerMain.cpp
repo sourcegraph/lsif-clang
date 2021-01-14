@@ -18,7 +18,7 @@
 #include "index/Symbol.h"
 #include "index/SymbolCollector.h"
 #include "clang/Index/IndexingOptions.h"
-#include "clang/Tooling/AllTUsExecution.h"
+#include "StacktracedTUsToolExecutor.cpp"
 #include "clang/Tooling/ArgumentsAdjusters.h"
 #include "clang/Tooling/CommonOptionsParser.h"
 #include "clang/Tooling/Execution.h"
@@ -117,9 +117,15 @@ private:
   std::string &ProjectRoot;
 };
 
+
+void baz() {
+ int *foo = (int*)-1; // make a bad pointer
+  printf("%d\n", *foo);       // causes segfault
+}
+
 int main(int argc, const char **argv) {
   //sys::PrintStackTraceOnErrorSignal(argv[0]);
-
+  //baz();
   CommonOptionsParser OptionsParser(argc, argv, LSIFClangCategory,
                                     cl::OneOrMore);
 
@@ -146,7 +152,7 @@ int main(int argc, const char **argv) {
   if (compilations.getAllFiles().size() == 0) {
     exit(1);
   }
-  AllTUsToolExecutor Executor(compilations, 0);
+  StacktracedTUsToolExecutor Executor(compilations, 0);
   auto Err =
     Executor.execute(std::make_unique<IndexActionFactory>(Data, ProjectRoot), Adjuster);
   if (Err) {

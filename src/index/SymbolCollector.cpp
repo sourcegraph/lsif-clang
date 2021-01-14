@@ -599,8 +599,14 @@ void SymbolCollector::finish() {
   IncludeFiles.clear();
 }
 
+void baz() {
+ int *foo = (int*)-1; // make a bad pointer
+  printf("%d\n", *foo);       // causes segfault
+}
+
 const Symbol *SymbolCollector::addDeclaration(const NamedDecl &ND, SymbolID ID,
                                               bool IsMainFileOnly) {
+  baz();
   auto &Ctx = ND.getASTContext();
   auto &SM = Ctx.getSourceManager();
 

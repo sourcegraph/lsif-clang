@@ -2,6 +2,7 @@
 #include "Trace.h"
 #include "llvm/ADT/ScopeExit.h"
 #include "llvm/Support/FormatVariadic.h"
+#include "indexer/backward-cpp/backward.hpp"
 #include "llvm/Support/Threading.h"
 #include <atomic>
 #include <thread>
@@ -86,6 +87,7 @@ void AsyncTaskRunner::runAsync(const llvm::Twine &Name,
 
   std::thread(
       [](std::string Name, decltype(Action) Action, decltype(CleanupTask)) {
+        backward::SignalHandling sh;
         llvm::set_thread_name(Name);
         Action();
         // Make sure function stored by Action is destroyed before CleanupTask
