@@ -63,6 +63,7 @@ struct IndexFileOut {
   IndexFileFormat Format = IndexFileFormat::RIFF;
   std::string ProjectRoot = "";
   bool Debug = false;
+  bool DebugFiles = false;
   const tooling::CompileCommand *Cmd = nullptr;
 
   IndexFileOut() = default;

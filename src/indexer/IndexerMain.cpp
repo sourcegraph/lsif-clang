@@ -53,6 +53,9 @@ static cl::opt<std::string>
 static cl::opt<bool> DebugArg("debug", cl::desc("Enable verbose debug output."),
                               cl::init(false), cl::cat(LSIFClangCategory));
 
+static cl::opt<bool> DebugFilesArg("debug-files", cl::desc("Debug files being processed."),
+                                   cl::init(false), cl::cat(LSIFClangCategory));
+
 class IndexActionFactory : public FrontendActionFactory {
 public:
   IndexActionFactory(clang::clangd::IndexFileIn &Result, std::string &ProjectRoot) : Result(Result), ProjectRoot(ProjectRoot) {}
@@ -154,6 +157,7 @@ int main(int argc, const char **argv) {
   clang::clangd::IndexFileOut Out(Data);
   Out.Format = clang::clangd::IndexFileFormat::LSIF;
   Out.Debug = DebugArg;
+  Out.DebugFiles = DebugFilesArg;
   Out.ProjectRoot = ProjectRoot;
   if (!IndexDestinationArg.empty()) {
     std::error_code FileErr;
