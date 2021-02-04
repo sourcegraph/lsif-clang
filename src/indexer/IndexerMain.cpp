@@ -126,12 +126,11 @@ int main(int argc, const char **argv) {
 
   std::string ProjectRoot = ProjectRootArg;
   if (ProjectRoot == "") {
-    SmallString<128> CurrentPath;
+    SmallString<1024> CurrentPath;
     sys::fs::current_path(CurrentPath);
-    ProjectRoot = std::string("file://") + CurrentPath.c_str();
-  } else if (ProjectRoot.rfind("file://", 0) != 0) {
-    ProjectRoot = std::string("file://") + ProjectRoot;
+    ProjectRoot = std::string(CurrentPath.c_str());
   }
+  ProjectRoot = clang::clangd::URI("file", "", ProjectRoot).toString();
   if (DebugArg) {
     llvm::errs() << "Using project root " << ProjectRoot << "\n";
   }
