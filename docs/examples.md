@@ -4,7 +4,7 @@ This page provides examples of generating compile_commands.json files for differ
 
 ## [github.com/torvalds/linux](https://github.com/torvalds/linux)
 
-![GIF displaying usage on the linux kernel.](gifs/torvalds-linux.gif)
+![GIF displaying usage on the linux kernel.](images/torvalds-linux.gif)
 
 Once you've installed the kernel dependencies (you can use the table in `Documentation/process/changes.rst`), run the following commands from the repository root:
 ```sh
