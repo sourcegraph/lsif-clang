@@ -1,7 +1,9 @@
 #!/bin/bash
 
+set -e
+
 if [[ -f "compile_commands.json" ]]; then
-    echo "Revmoving old compile_commands.json"
+    echo "Removing old compile_commands.json"
     rm compile_commands.json
 fi
 
