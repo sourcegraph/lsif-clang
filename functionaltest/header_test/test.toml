@@ -5,7 +5,7 @@
     Request.Position = { Line = 6, Character = 8 }
 
     Response.TextDocument = "src/uses_header.c"
-    Response.Range.Start.Line = 11
+    Response.Range.Start.Line = 10
     Response.Range.Start.Character = 5
     Response.Range.End.Line = 10
     Response.Range.End.Character = 22
