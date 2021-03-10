@@ -1,0 +1,20 @@
+[tool.black]
+line-length = 120
+
+[tool.poetry]
+name = "lsif-clang"
+version = "0.1.0"
+description = ""
+authors = ["TJ DeVries <devries.timothyj@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+click = "^7.1.2"
+GitPython = "^3.1.14"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
