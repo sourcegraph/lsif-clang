@@ -68,12 +68,12 @@ def _checkout_temp_lsif_clang():
     _checkout_repo("https://github.com/sourcegraph/lsif-clang", TEMP_LSIF_CLANG)
 
 
-def _checkout_llvm_tag(p: Path, release: str):
-    if not p.exists():
+def _checkout_llvm_tag(release: str):
+    if not LLVM_ROOT.exists():
         raise Exception("Missing llvm project")
 
     # TODO: This is a bit annoying, since idk how to do this with the git thing.
-    llvm_repo = Repo(p.absolute())
+    llvm_repo = Repo(LLVM_ROOT.absolute())
     release_tag = llvm_repo.tags[release]
     if llvm_repo.head.commit == release_tag.commit:
         logging.info(f"Already checked out to: {release}")
@@ -108,6 +108,7 @@ def _get_llvm_diff(p: Path, latest_commit: str, tag: str) -> str:
 
 
 def _transform_llvm_diff(output: str) -> str:
+    # Maps source files from "/clang-tools-extra/clangd" -> "/
     output = output.replace("clang-tools-extra/clangd/", "")
 
     return output
