@@ -339,7 +339,7 @@ class Foo {})cpp";
          HI.Definition = "~X()";
          HI.Parameters.emplace();
        }},
-      {"class X { operator [[in^t]](); };",
+      {"class X { [[op^erator]] int(); };",
        [](HoverInfo &HI) {
          HI.NamespaceScope = "";
          HI.Name = "operator int";
@@ -347,6 +347,13 @@ class Foo {})cpp";
          HI.Kind = index::SymbolKind::ConversionFunction;
          HI.Definition = "operator int()";
          HI.Parameters.emplace();
+       }},
+      {"class X { operator [[^X]]*(); };",
+       [](HoverInfo &HI) {
+         HI.NamespaceScope = "";
+         HI.Name = "X";
+         HI.Kind = index::SymbolKind::Class;
+         HI.Definition = "class X {}";
        }},
 
       // auto on lambda
@@ -1614,6 +1621,22 @@ TEST(Hover, All) {
             HI.Name = "expression";
             HI.Type = "unsigned long";
             HI.Value = "1";
+          }},
+      {
+          R"cpp(
+          template <typename T = int>
+          void foo(const T& = T()) {
+            [[f^oo]]<>(3);
+          })cpp",
+          [](HoverInfo &HI) {
+            HI.Name = "foo";
+            HI.Kind = index::SymbolKind::Function;
+            HI.Type = "void (const int &)";
+            HI.ReturnType = "void";
+            HI.Parameters = {
+                {std::string("const int &"), llvm::None, std::string("T()")}};
+            HI.Definition = "template <> void foo<int>(const int &)";
+            HI.NamespaceScope = "";
           }},
   };
 
