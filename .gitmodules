@@ -1,3 +1,6 @@
 [submodule "src/indexer/backward-cpp"]
     path = src/indexer/backward-cpp
     url = https://github.com/bombela/backward-cpp.git
+[submodule "functionaltest/nvim_test/neovim"]
+	path = functionaltest/nvim_test/neovim
+	url = https://github.com/neovim/neovim
