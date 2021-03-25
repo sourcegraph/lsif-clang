@@ -1,0 +1,20 @@
+{
+    "textDocument/definition": [
+        {
+            "name": "simple",
+            "request": {
+                "textDocument": "src/uses_header.c",
+                "position": {
+                    "line": 6, "character": 8
+                }
+            },
+            "response": {
+                "textDocument": "src/uses_header.c",
+                "range": {
+                    "start": { "line": 10, "character": 5 },
+                    "end": { "line": 10, "character": 22}
+                }
+            }
+        }
+    ]
+}
