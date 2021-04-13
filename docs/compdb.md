@@ -3,9 +3,9 @@
 lsif-clang figures out how to compile your code by reading from a [JSON compilation database](http://clang.llvm.org/docs/JSONCompilationDatabase.html), a specification published by the LLVM project. This page contains detailed instructions for how to generate compilation databases for various build systems.
 
 There are several methods for creating a JSON compilation database. We list some that we have had success using below:
-- [Cmake](##Cmake)
-- [Bazel](##Bazel)
-- [Bear](##Bear)
+- [Cmake](#Cmake)
+- [Bazel](#Bazel)
+- [Bear](#Bear)
 
 ## CMake
 
