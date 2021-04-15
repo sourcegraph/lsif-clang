@@ -62,6 +62,15 @@ bazel build \
 
 NOTE: The bazel query might look different for your project.
 
+## CompDB
+
+The [compilation database generator](https://github.com/nickdiego/compiledb) is
+another tool that can be used. We have seen mixed results from this project,
+but it could be worth trying in the interest of not having to do a full
+build, like Bear would have to do.
+
+Follow the directions linked above to attempt it for your codebase!
+
 
 ## Bear
 
