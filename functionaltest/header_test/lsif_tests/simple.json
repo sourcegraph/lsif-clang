@@ -9,7 +9,7 @@
                 }
             },
             "response": {
-                "textDocument": "src/uses_header.c",
+                "uri": "file://src/uses_header.c",
                 "range": {
                     "start": { "line": 10, "character": 5 },
                     "end": { "line": 10, "character": 22}
