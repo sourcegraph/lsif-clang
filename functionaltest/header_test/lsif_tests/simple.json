@@ -16,5 +16,21 @@
                 }
             }
         }
+    ],
+
+    "textDocument/references": [
+        {
+            "name": "Refer",
+            "request": {
+                "textDocument": "src/uses_header.c",
+                "position": {
+                    "line": 6, "character": 8
+                },
+                "context": {
+                    "includeDeclaration": true
+                }
+            },
+            "response": []
+        }
     ]
 }
