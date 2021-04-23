@@ -11,8 +11,4 @@
 
 #include "index/Serialization.h"
 
-namespace clang {
-namespace clangd {
-  void writeLSIF(const IndexFileOut &O, llvm::raw_ostream &OS);
-}// namespace clangd
-}// namespace clang
+void writeLSIF(const clang::clangd::IndexFileOut &O, llvm::raw_ostream &OS, bool Debug, bool DebugFiles, const std::string &ProjectRoot);

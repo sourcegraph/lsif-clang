@@ -12,14 +12,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "LSIFSerialization.h"
-#include "Index.h"
-#include "Relation.h"
-#include "Serialization.h"
-#include "SymbolLocation.h"
-#include "SymbolOrigin.h"
-#include "dex/Dex.h"
+#include "index/Index.h"
+#include "index/Relation.h"
+#include "index/Serialization.h"
 #include "index/Symbol.h"
 #include "index/SymbolID.h"
+#include "index/SymbolLocation.h"
+#include "index/SymbolOrigin.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/Optional.h"
 #include "llvm/ADT/STLExtras.h"
@@ -63,8 +62,10 @@ template <> struct DenseMapInfo<clang::clangd::SymbolLocation> {
 
 namespace {
 struct LSIFMeta {
-  LSIFMeta(llvm::raw_ostream &OS, const clang::clangd::IndexFileOut &O)
-    : OS(OS), ProjectRoot(O.ProjectRoot), Debug(O.Debug), DebugFiles(O.DebugFiles) {}
+  LSIFMeta(llvm::raw_ostream &OS, bool Debug, bool DebugFiles,
+           const std::string &ProjectRoot)
+      : OS(OS), ProjectRoot(ProjectRoot), Debug(Debug), DebugFiles(DebugFiles) {
+  }
   llvm::raw_ostream &OS;
   const std::string ProjectRoot;
   const bool Debug;
@@ -76,11 +77,11 @@ struct LSIFMeta {
   llvm::DenseMap<clang::clangd::SymbolLocation, int> RangeIDs;
 
   bool contains(const char *FileURI) {
-    bool contains = FileURI && llvm::StringRef(FileURI).startswith(ProjectRoot);
-    if (!contains && DebugFiles) {
+    bool Contains = FileURI && llvm::StringRef(FileURI).startswith(ProjectRoot);
+    if (!Contains && DebugFiles) {
       llvm::errs() << "Ignoring file: " << llvm::StringRef(FileURI) << "\n";
     }
-    return contains;
+    return Contains;
   }
 };
 
@@ -259,11 +260,11 @@ void writeHoverResult(LSIFMeta &Meta, const clang::clangd::Symbol &Sym,
           JSONOut.attribute("value", OHover.str());
         });
         if (Sym.Documentation.data() && !Sym.Documentation.empty()) {
-          auto docString = Sym.Documentation;
-          if(!llvm::json::isUTF8(docString)) {
-            docString = llvm::StringRef(llvm::json::fixUTF8(Sym.Documentation));
+          auto DocString = Sym.Documentation;
+          if (!llvm::json::isUTF8(DocString)) {
+            DocString = llvm::StringRef(llvm::json::fixUTF8(Sym.Documentation));
           }
-          JSONOut.value(docString);
+          JSONOut.value(DocString);
         }
       });
     });
@@ -330,10 +331,9 @@ void writeSymbol(LSIFMeta &Meta, const clang::clangd::Symbol &Sym,
 
 } // namespace
 
-namespace clang {
-namespace clangd {
-void writeLSIF(const IndexFileOut &O, llvm::raw_ostream &OS) {
-  LSIFMeta Meta(OS, O);
+void writeLSIF(const clang::clangd::IndexFileOut &O, llvm::raw_ostream &OS,
+               bool Debug, bool DebugFiles, const std::string &ProjectRoot) {
+  LSIFMeta Meta(OS, Debug, DebugFiles, ProjectRoot);
 
   writeMetaTuple(Meta, O);
   writeProjectTuple(Meta, O);
@@ -349,7 +349,8 @@ void writeLSIF(const IndexFileOut &O, llvm::raw_ostream &OS) {
   }
 
   if (O.Refs) {
-    for (const std::pair<SymbolID, ArrayRef<Ref>> &Ref : *O.Refs) {
+    for (const std::pair<clang::clangd::SymbolID,
+                         llvm::ArrayRef<clang::clangd::Ref>> &Ref : *O.Refs) {
       auto Sym = O.Symbols->find(Ref.first);
       if (Sym != O.Symbols->end()) {
         writeSymbol(Meta, *Sym, Ref.second);
@@ -359,5 +360,3 @@ void writeLSIF(const IndexFileOut &O, llvm::raw_ostream &OS) {
 
   Meta.OS.flush();
 }
-} // namespace clangd
-} // namespace clang

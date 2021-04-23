@@ -42,8 +42,8 @@ message(STATUS "Using ClangConfig.cmake in: ${CLANG_CMAKE_DIR}")
 include_directories(${LLVM_INCLUDE_DIRS})
 
 add_executable(lsif-clang
-    LsifClangMain.cpp
-    # src/LsifSerialization.cpp
+    LSIFClangMain.cpp
+    LSIFSerialization.cpp
     # src/LsifMerge.cpp
     # src/LsifIndexAction.cpp
     # ${BACKWARD_ENABLE}
@@ -55,29 +55,44 @@ include_directories("../clangd/")
 
 
 add_library(clangDaemonMinimal
-
   ../clangd/AST.cpp
   ../clangd/CodeCompletionStrings.cpp
+  ../clangd/CollectMacros.cpp
+  ../clangd/Compiler.cpp
+  ../clangd/Diagnostics.cpp
   ../clangd/ExpectedTypes.cpp
   ../clangd/FindTarget.cpp
+  ../clangd/FS.cpp
   ../clangd/FuzzyMatch.cpp
   ../clangd/Headers.cpp
+  ../clangd/Preamble.cpp
   ../clangd/Protocol.cpp
   ../clangd/SourceCode.cpp
   ../clangd/URI.cpp
+
   ../clangd/support/Context.cpp
   ../clangd/support/Logger.cpp
   ../clangd/support/Trace.cpp
+  ../clangd/support/ThreadsafeFS.cpp
+
+  ../clangd/index/CanonicalIncludes.cpp
+  ../clangd/index/Index.cpp
+  ../clangd/index/IndexAction.cpp
+  ../clangd/index/Merge.cpp
+  ../clangd/index/Ref.cpp
+  ../clangd/index/Relation.cpp
+  ../clangd/index/Symbol.cpp
+  ../clangd/index/SymbolCollector.cpp
+  ../clangd/index/SymbolID.cpp
+  ../clangd/index/SymbolLocation.cpp
+  ../clangd/index/SymbolOrigin.cpp
 
   # Cancellation.cpp
   # ClangdLSPServer.cpp
   # ClangdServer.cpp
   # CodeComplete.cpp
   # CompileCommands.cpp
-  # Compiler.cpp
-  # Diagnostics.cpp
   # DraftStore.cpp
-  # FS.cpp
   # FSProvider.cpp
   # FileDistance.cpp
   # FindSymbols.cpp
@@ -90,7 +105,6 @@ add_library(clangDaemonMinimal
   # JSONTransport.cpp
   # ParsedAST.cpp
   # PathMapping.cpp
-  # Preamble.cpp
   # Quality.cpp
   # QueryDriverDatabase.cpp
   # RIFF.cpp
@@ -102,6 +116,8 @@ add_library(clangDaemonMinimal
   # Threading.cpp
   # XRefs.cpp
 
+  # support/Markup.cpp
+
   # index/Background.cpp
   # index/BackgroundIndexLoader.cpp
   # index/BackgroundIndexStorage.cpp
@@ -111,17 +127,6 @@ add_library(clangDaemonMinimal
   # index/MemIndex.cpp
   # index/Serialization.cpp
   # index/YAMLSerialization.cpp
-  ../clangd/index/CanonicalIncludes.cpp
-  ../clangd/index/Index.cpp
-  ../clangd/index/IndexAction.cpp
-  ../clangd/index/Merge.cpp
-  ../clangd/index/Ref.cpp
-  ../clangd/index/Relation.cpp
-  ../clangd/index/Symbol.cpp
-  ../clangd/index/SymbolCollector.cpp
-  ../clangd/index/SymbolID.cpp
-  ../clangd/index/SymbolLocation.cpp
-  ../clangd/index/SymbolOrigin.cpp
 
   # index/dex/Dex.cpp
   # index/dex/Iterator.cpp
@@ -148,7 +153,7 @@ set(CLANG_DAEMON_LIBS
   clangLex
   clangSema
   clangSerialization
-  # clangTidy
+  clangTidy
   clangTooling
   clangToolingCore
   clangToolingInclusions

@@ -11,6 +11,7 @@
 #include "Headers.h"
 #include "SymbolCollector.h"
 #include "clang/Frontend/FrontendActions.h"
+#include "clang/Index/IndexingOptions.h" // sourcegraph
 
 namespace clang {
 namespace clangd {
@@ -25,6 +26,7 @@ namespace clangd {
 //   - the symbol origin is set to Static if not specified by caller
 std::unique_ptr<FrontendAction> createStaticIndexingAction(
     SymbolCollector::Options Opts,
+    clang::index::IndexingOptions IndexOpts, // sourcegraph
     std::function<void(SymbolSlab)> SymbolsCallback,
     std::function<void(RefSlab)> RefsCallback,
     std::function<void(RelationSlab)> RelationsCallback,

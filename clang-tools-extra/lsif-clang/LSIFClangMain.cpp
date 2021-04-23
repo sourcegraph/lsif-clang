@@ -8,8 +8,8 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "LSIFSerialization.h"
 #include "index/IndexAction.h"
-#include "index/LSIFSerialization.h"
 #include "index/Merge.h"
 #include "index/Ref.h"
 #include "index/Serialization.h"
@@ -53,12 +53,15 @@ static cl::opt<std::string>
 static cl::opt<bool> DebugArg("debug", cl::desc("Enable verbose debug output."),
                               cl::init(false), cl::cat(LSIFClangCategory));
 
-static cl::opt<bool> DebugFilesArg("debug-files", cl::desc("Debug files being processed."),
+static cl::opt<bool> DebugFilesArg("debug-files",
+                                   cl::desc("Debug files being processed."),
                                    cl::init(false), cl::cat(LSIFClangCategory));
 
 class IndexActionFactory : public FrontendActionFactory {
 public:
-  IndexActionFactory(clang::clangd::IndexFileIn &Result, std::string &ProjectRoot) : Result(Result), ProjectRoot(ProjectRoot) {}
+  IndexActionFactory(clang::clangd::IndexFileIn &Result,
+                     std::string &ProjectRoot)
+      : Result(Result), ProjectRoot(ProjectRoot) {}
 
   std::unique_ptr<clang::FrontendAction> create() override {
     clang::clangd::SymbolCollector::Options Opts;
@@ -79,7 +82,7 @@ public:
           std::lock_guard<std::mutex> Lock(SymbolsMu);
           for (const auto &Sym : S) {
             if (const auto *Existing = Symbols.find(Sym.ID))
-              Symbols.insert(mergeSymbol(*Existing, Sym, ProjectRoot));
+              Symbols.insert(mergeSymbol(*Existing, Sym /*, ProjectRoot*/));
             else
               Symbols.insert(Sym);
           }
@@ -119,7 +122,7 @@ private:
 };
 
 int main(int argc, const char **argv) {
-  //sys::PrintStackTraceOnErrorSignal(argv[0]);
+  // sys::PrintStackTraceOnErrorSignal(argv[0]);
 
   CommonOptionsParser OptionsParser(argc, argv, LSIFClangCategory,
                                     cl::OneOrMore);
@@ -142,31 +145,28 @@ int main(int argc, const char **argv) {
   // Collect symbols found in each translation unit, merging as we go.
   clang::clangd::IndexFileIn Data;
 
-  auto& compilations = OptionsParser.getCompilations();
-  if (compilations.getAllFiles().size() == 0) {
+  auto &Compilations = OptionsParser.getCompilations();
+  if (Compilations.getAllFiles().size() == 0) {
     exit(1);
   }
-  AllTUsToolExecutor Executor(compilations, 0);
-  auto Err =
-    Executor.execute(std::make_unique<IndexActionFactory>(Data, ProjectRoot), Adjuster);
+  AllTUsToolExecutor Executor(Compilations, 0);
+  auto Err = Executor.execute(
+      std::make_unique<IndexActionFactory>(Data, ProjectRoot), Adjuster);
   if (Err) {
   }
 
   // Emit collected data.
   clang::clangd::IndexFileOut Out(Data);
-  Out.Format = clang::clangd::IndexFileFormat::LSIF;
-  Out.Debug = DebugArg;
-  Out.DebugFiles = DebugFilesArg;
-  Out.ProjectRoot = ProjectRoot;
+
   if (!IndexDestinationArg.empty()) {
     std::error_code FileErr;
     raw_fd_ostream IndexOstream(IndexDestinationArg, FileErr);
     if (FileErr.value() != 0) {
       report_fatal_error(FileErr.message());
     }
-    writeLSIF(Out, IndexOstream);
+    writeLSIF(Out, IndexOstream, DebugArg, DebugFilesArg, ProjectRoot);
   } else {
-    writeLSIF(Out, outs());
+    writeLSIF(Out, outs(), DebugArg, DebugFilesArg, ProjectRoot);
   }
   return 0;
 }
