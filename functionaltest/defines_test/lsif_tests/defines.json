@@ -1,0 +1,23 @@
+{
+    "textDocument/definition": [
+        {
+            "name": "simple",
+            "request": {
+                "textDocument": "file://src/uses_define.c",
+                "position": {
+                    "line": 9, "character": 12
+                }
+            },
+            "response": {
+                "uri": "file://src/uses_define.c",
+                "range": {
+                    "start": { "line": 10, "character": 5 },
+                    "end": { "line": 10, "character": 22}
+                }
+            }
+        }
+    ],
+    "textDocument/references": [
+
+    ]
+}
