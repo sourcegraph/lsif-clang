@@ -1,19 +1,52 @@
 {
     "textDocument/definition": [
         {
-            "name": "simple",
+            "name": "definition",
             "request": {
-                "textDocument": "file://src/uses_define.c",
+                "textDocument": "src/uses_define.c",
                 "position": {
                     "line": 9, "character": 12
+                }
+            },
+            "response":  {
+                "uri": "file://src/uses_define.c",
+                "range": {
+                    "start": { "line": 9, "character": 4 },
+                    "end": {"line": 9, "character": 15 }
+                }
+            }
+        },
+        {
+            "name": "macro_call",
+            "request": {
+                "textDocument": "src/uses_define.c",
+                "position": {
+                    "line": 16, "character": 4
                 }
             },
             "response": {
                 "uri": "file://src/uses_define.c",
                 "range": {
-                    "start": { "line": 10, "character": 5 },
-                    "end": { "line": 10, "character": 22}
+                    "start": { "line": 5, "character": 8 },
+                    "end": {"line": 5, "character": 20 }
                 }
+            }
+        },
+        {
+            "name": "macro_constant",
+            "request": {
+                "textDocument": "src/uses_define.c",
+                "position": {
+                    "line": 20, "character": 29
+                }
+            },
+            "response": {
+                "uri": "file://src/uses_define.c",
+                "range": {
+                    "start": { "line": 2, "character": 8 },
+                    "end": {"line": 2, "character": 22 }
+                }
+
             }
         }
     ],

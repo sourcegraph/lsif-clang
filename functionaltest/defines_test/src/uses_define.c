@@ -1,6 +1,6 @@
 
 // Constant define, does it know the definition
-#define LINE_BUFFER_SIZE 4096
+#define JUST_A_CONSTANT 3
 
 
 #define DUMB_EXAMPLE(one, three) \
@@ -17,6 +17,8 @@ int main()
   DUMB_EXAMPLE(1, 3);
 
   my_function(1, 2, 3);
+
+  my_function(1, 2, JUST_A_CONSTANT);
 
   return 0;
 }
