@@ -1,3 +1,12 @@
+# Sourcegraph: `lsif-clang`
+
+
+
+- [Forking Strategy](./docs/fork_strategy.md)
+
+
+(below is original LLVM readme)
+
 # The LLVM Compiler Infrastructure
 
 This directory and its sub-directories contain source code for LLVM,
