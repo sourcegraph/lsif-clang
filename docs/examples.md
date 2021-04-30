@@ -18,7 +18,7 @@ lsif-clang compile_commands.json
 
 Use the following steps:
 ```sh
-./bazel/setup_clang.sh /usr/lib/llvm-10    # or wherever your llvm installation lives
+./bazel/setup_clang.sh /usr/lib/llvm-11    # or wherever your llvm installation lives
 echo 'build --config=clang' > user.bazelrc
 TEST_TMPDIR=/tmp tools/gen_compilation_database.py --include_headers --run_bazel_build
 lsif-clang compile_commands.json
