@@ -26,15 +26,9 @@ if (PATH_TO_LLVM)
   message(STATUS "Searching in: ${search_paths}")
 endif()
 
-
 find_package(Clang
   REQUIRED CONFIG
   PATHS ${search_paths}
-  )
-
-find_package(LLVM
-  ${SG_LLVM_VERSION}
-  REQUIRED CONFIG
   )
 
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
