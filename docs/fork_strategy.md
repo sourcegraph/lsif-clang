@@ -42,4 +42,5 @@ Lastly, this makes the possibility of eventually merging this in to LLVM more li
       - This would leave to unsustainable changes and very weird behavior.
   - Example: https://github.com/tjdevries/lsif-clang-tmp
     - You can see an example of the strategy here, although we did not finish it because we ran into some difficulties.
+    - For example, when trying to modify some behaviors of the SymbolCollector, it resulted in attempts to copy / inherit / override a lot of LLVM code, which seemed like it would end up being a large maintainence burden.
 
