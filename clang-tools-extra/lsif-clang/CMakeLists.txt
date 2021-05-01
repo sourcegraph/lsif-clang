@@ -133,5 +133,7 @@ else()
   )
 endif()
 
-target_link_libraries(lsif-clang clangDaemonMinimal)
-
+target_link_libraries(lsif-clang
+  stdc++
+  clangDaemonMinimal
+)
