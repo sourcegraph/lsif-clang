@@ -137,3 +137,5 @@ target_link_libraries(lsif-clang
   stdc++
   clangDaemonMinimal
 )
+
+install(TARGETS lsif-clang)

@@ -14,6 +14,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 
 if (PATH_TO_LLVM)
   set (search_paths
+    PATHS
     ${PATH_TO_LLVM}
     ${PATH_TO_LLVM}/cmake
     ${PATH_TO_LLVM}/lib/cmake
@@ -21,6 +22,7 @@ if (PATH_TO_LLVM)
     ${PATH_TO_LLVM}/lib/cmake/clang
     ${PATH_TO_LLVM}/share/clang/cmake/
     ${PATH_TO_LLVM}/share/llvm/cmake/
+    NO_DEFAULT_PATH NO_CMAKE_PATH
   )
 
   message(STATUS "Searching in: ${search_paths}")
@@ -28,7 +30,7 @@ endif()
 
 find_package(Clang
   REQUIRED CONFIG
-  PATHS ${search_paths}
+  ${search_paths}
   )
 
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
