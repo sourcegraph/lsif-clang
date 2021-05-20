@@ -4,7 +4,7 @@
 
 This project is a fork of [clangd](https://clangd.llvm.org/) with patches to add support for outputting [LSIF indexes](https://microsoft.github.io/language-server-protocol/specifications/lsif/0.5.0/specification/). Specifically, a fork of the [llvm-project repo](https://github.com/llvm/llvm-project/) with a new tool `lsif-clang` under the `clang-tools-extra` subdirectory and patches to files under `clang-tools-extra/clangd`. There's more info about the repo structure and its history in the [Forking Strategy](./docs/fork_strategy.md) doc.
 
-This project has only been tested extensively on C++ projects and C projects, but Objective C projects should both be supported as well following the same instructions.
+This project has only been tested extensively on C++ projects and C projects, but Objective C projects should both be supported as well following the same instructions. See the [compatibility](docs/compatibility.md) page for more detailed information about which kinds of projects are supported.
 
 # Alternatives for C++ Projects
 
