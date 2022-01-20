@@ -1,4 +1,4 @@
-FROM ubuntu:20.10 as build
+FROM ubuntu:22.04 as build
 
 RUN apt update && apt install -y llvm-11 clang-11 libclang-11-dev cmake
 
@@ -8,7 +8,7 @@ COPY . .
 
 RUN CC=clang-11 CXX=clang-11 cmake -B build && make -C build -j$(nproc)
 
-FROM ubuntu:20.10
+FROM ubuntu:22.04
 
 RUN apt update && apt install -y libllvm11 cmake clang-11
 
