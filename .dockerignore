@@ -1,0 +1,8 @@
+# Don't copy our own file so edits to it don't cause rebuilds
+
+Dockerfile
+*.Dockerfile
+
+.dockerignore
+
+clang-tools-extra/lsif-clang/package/build.sh
