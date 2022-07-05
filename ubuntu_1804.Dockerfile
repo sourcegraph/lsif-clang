@@ -21,16 +21,13 @@ COPY . .
 
 RUN mkdir /lsif-clang/build
 RUN cd /lsif-clang/build && CC=clang-11 CXX=clang-11 cmake .. && make -C /lsif-clang/build -j$(nproc)
+RUN cd /lsif-clang && clang-tools-extra/lsif-clang/package/copy_dependencies.sh ./bin/lsif-clang ./bin
 
 FROM ubuntu:18.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-COPY --from=build /lsif-clang/bin/lsif-clang /usr/local/bin/lsif-clang
-
-# NOTE: keep in sync with build.sh
-# TODO: static build instead of copying over the libraries we need
-COPY --from=build /usr/lib/x86_64-linux-gnu/libclang-cpp.so.11 /usr/lib/x86_64-linux-gnu/libclang-cpp.so.11
-COPY --from=build /usr/lib/x86_64-linux-gnu/libLLVM-11.so.1 /usr/lib/x86_64-linux-gnu/libLLVM-11.so.1
+# This will bring all required dependencies
+COPY --from=build /lsif-clang/bin /usr/local/bin
 
 ENTRYPOINT [ "lsif-clang" ]

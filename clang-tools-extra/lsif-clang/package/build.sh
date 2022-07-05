@@ -1,5 +1,7 @@
 #! /bin/bash
 
+# Build lsif-clang in a container then extra out all the needed files.
+
 set -euo pipefail
 
 # Configuration
@@ -35,20 +37,12 @@ docker create --name "$container_name" "$image_name"
 # Get the files we need out of the image
 echo "[Extracting needed files]"
 rm -rf "$output_folder"
-mkdir "$output_folder"
+mkdir -p "$(dirname "$output_folder")"
 
-needed_libraries=(
-    "libclang-cpp.so.11"
-    "libLLVM-11.so.1"
-)
-
-docker cp "$container_name:/usr/local/bin/lsif-clang" "$output_folder/lsif-clang.bin"
-
-for libname in "${needed_libraries[@]}"; do
-    docker cp "$container_name:/usr/lib/x86_64-linux-gnu/$libname" "$output_folder/$libname"
-done
+docker cp "$container_name:/usr/local/bin" "$output_folder"
 
 # Install the shim in our package
+mv "$output_folder/lsif-clang" "$output_folder/lsif-clang.bin"
 cp "$script_dir/lsif_clang_shim.sh" "$output_folder/lsif-clang"
 
 chown "$USER:$(id -g)" "$output_folder"/*
