@@ -1,0 +1,10 @@
+# We make our own build folder, so it doesn't need to be copied
+build
+
+# Don't copy our own files so edits to it don't cause rebuilds
+.dockerignore
+Dockerfile
+*.Dockerfile
+
+# This is only used outside of docker
+clang-tools-extra/lsif-clang/package/build.sh
