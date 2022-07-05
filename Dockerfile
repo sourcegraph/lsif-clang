@@ -1,6 +1,6 @@
 FROM ubuntu:22.04 as build
 
-RUN apt update && apt install -y llvm-11 clang-11 libclang-11-dev cmake libdwarf-dev libelf-dev
+RUN apt update && apt install -y llvm-11 llvm-11-dev clang-11 libclang-11-dev cmake libdwarf-dev libelf-dev
 
 WORKDIR /lsif-clang
 
