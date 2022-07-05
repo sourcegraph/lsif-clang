@@ -57,6 +57,11 @@ static cl::opt<bool> DebugFilesArg("debug-files",
                                    cl::desc("Debug files being processed."),
                                    cl::init(false), cl::cat(LSIFClangCategory));
 
+static cl::opt<int> JobsArg("jobs",
+                            cl::desc("The number of cores to build with, default all"),
+                            cl::init(0), cl::cat(LSIFClangCategory));
+
+
 class IndexActionFactory : public FrontendActionFactory {
 public:
   IndexActionFactory(clang::clangd::IndexFileIn &Result,
@@ -149,7 +154,9 @@ int main(int argc, const char **argv) {
   if (Compilations.getAllFiles().size() == 0) {
     exit(1);
   }
-  AllTUsToolExecutor Executor(Compilations, 0);
+
+  const int jobCount = JobsArg;
+  AllTUsToolExecutor Executor(Compilations, jobCount);
   auto Err = Executor.execute(
       std::make_unique<IndexActionFactory>(Data, ProjectRoot), Adjuster);
   if (Err) {
