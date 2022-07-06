@@ -6,6 +6,7 @@ add_executable(lsif-clang
 
 # Make other directories available to us in clang-tools-extra
 include_directories("../clangd/")
+include_directories("../../clang/include/")
 # add_subdirectory("../clangd/indexer/")
 
 
@@ -133,9 +134,38 @@ else()
   )
 endif()
 
-target_link_libraries(lsif-clang
-  stdc++
-  clangDaemonMinimal
-)
+if (UNIX AND NOT APPLE)
+  foreach(HEADER_NAME "dwarf.h" "libelf.h")
+    find_path(HEADER_INCLUDE_DIR "${HEADER_NAME}"
+      /usr/include
+      /usr/local/include
+      /usr/include/libdwarf
+      /usr/include/libelf)
+    if (NOT HEADER_INCLUDE_DIR)
+      message(FATAL_ERROR "Couldn't find header ${HEADER_NAME}, did you install libdwarf-dev and libelf-dev?")
+    endif()
+    message(STATUS "Found ${HEADER_NAME} in: ${HEADER_INCLUDE_DIR}")
+    target_include_directories(lsif-clang PRIVATE "${HEADER_INCLUDE_DIR}")
+  endforeach()
+
+  # libdwarf is not available on macOS AFAIK
+  target_link_libraries(lsif-clang
+    stdc++
+    clangDaemonMinimal
+    dwarf
+    # Linking libelf and libdl explicitly seems to be necessary after linking libdwarf
+    # Otherwise, we get errors like:
+    #  /lib/aarch64-linux-gnu/libelf.so.1: error adding symbols: DSO missing from command line
+    #  /lib/aarch64-linux-gnu/libdl.so.2: error adding symbols: DSO missing from command line
+    # See also: https://stackoverflow.com/a/38375709/2682729
+    elf
+    dl
+  )
+else()
+  target_link_libraries(lsif-clang
+    stdc++
+    clangDaemonMinimal
+  )
+endif()
 
 install(TARGETS lsif-clang)
