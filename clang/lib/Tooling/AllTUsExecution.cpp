@@ -6,6 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "clang/Tooling/Backward.hpp"
 #include "clang/Tooling/AllTUsExecution.h"
 #include "clang/Tooling/ToolExecutorPluginRegistry.h"
 #include "llvm/Support/Regex.h"
@@ -119,6 +120,7 @@ llvm::Error AllTUsToolExecutor::execute(
     for (std::string File : Files) {
       Pool.async(
           [&](std::string Path) {
+            backward::SignalHandling sh;
             Log("[" + std::to_string(Count()) + "/" + TotalNumStr +
                 "] Processing file " + Path);
             // Each thread gets an indepent copy of a VFS to allow different

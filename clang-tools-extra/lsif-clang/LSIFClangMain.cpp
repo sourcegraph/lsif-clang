@@ -16,6 +16,7 @@
 #include "index/Symbol.h"
 #include "index/SymbolCollector.h"
 #include "clang/Index/IndexingOptions.h"
+#include "clang/Tooling/Backward.hpp"
 #include "clang/Tooling/AllTUsExecution.h"
 #include "clang/Tooling/ArgumentsAdjusters.h"
 #include "clang/Tooling/CommonOptionsParser.h"
@@ -29,8 +30,6 @@
 #include "llvm/Support/Signals.h"
 #include "llvm/Support/raw_ostream.h"
 #include <system_error>
-
-#define BACKWARD_HAS_DWARF 1
 
 using namespace clang::tooling;
 using namespace llvm;
@@ -56,6 +55,11 @@ static cl::opt<bool> DebugArg("debug", cl::desc("Enable verbose debug output."),
 static cl::opt<bool> DebugFilesArg("debug-files",
                                    cl::desc("Debug files being processed."),
                                    cl::init(false), cl::cat(LSIFClangCategory));
+
+static cl::opt<unsigned> JobsArg("jobs",
+                            cl::desc("The number of threads to use for parallelism, 0 being a shortcut for NCPUs. Defaults to 0."),
+                            cl::init(0), cl::cat(LSIFClangCategory));
+
 
 class IndexActionFactory : public FrontendActionFactory {
 public:
@@ -123,6 +127,7 @@ private:
 
 int main(int argc, const char **argv) {
   // sys::PrintStackTraceOnErrorSignal(argv[0]);
+  backward::SignalHandling sh;
 
   CommonOptionsParser OptionsParser(argc, argv, LSIFClangCategory,
                                     cl::OneOrMore);
@@ -149,7 +154,8 @@ int main(int argc, const char **argv) {
   if (Compilations.getAllFiles().size() == 0) {
     exit(1);
   }
-  AllTUsToolExecutor Executor(Compilations, 0);
+
+  AllTUsToolExecutor Executor(Compilations, JobsArg);
   auto Err = Executor.execute(
       std::make_unique<IndexActionFactory>(Data, ProjectRoot), Adjuster);
   if (Err) {
