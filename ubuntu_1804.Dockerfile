@@ -22,7 +22,7 @@ COPY . .
 RUN cd /lsif-clang && \
     CC=clang-11 CXX=clang-11 cmake -B build && \
     make -C /lsif-clang/build -j$(nproc) && \
-    clang-tools-extra/lsif-clang/package/copy_dependencies.sh ./bin/lsif-clang ./bin
+    clang-tools-extra/lsif-clang/package/copy_needed_dynamic_libs.sh ./bin/lsif-clang ./bin
 
 FROM ubuntu:18.04
 
