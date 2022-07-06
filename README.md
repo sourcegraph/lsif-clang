@@ -30,3 +30,8 @@ See the [examples](docs/examples.md) of producing LSIF indexes for a variety of 
 # Testing the output
 
 You can use the [lsif-validate](https://github.com/sourcegraph/lsif-test) tool for basic sanity checking, or [upload the index to a Sourcegraph instance](https://docs.sourcegraph.com/user/code_intelligence/lsif_quickstart) to see the hovers, definitions, and references in action.
+
+# Additional licensing notes
+
+We use the [backwards-cpp](https://github.com/bombela/backward-cpp) code
+which is [MIT licensed](https://github.com/bombela/backward-cpp/blob/master/LICENSE.txt).

@@ -16,6 +16,7 @@
 #include "index/Symbol.h"
 #include "index/SymbolCollector.h"
 #include "clang/Index/IndexingOptions.h"
+#include "clang/Tooling/Backward.hpp"
 #include "clang/Tooling/AllTUsExecution.h"
 #include "clang/Tooling/ArgumentsAdjusters.h"
 #include "clang/Tooling/CommonOptionsParser.h"
@@ -29,8 +30,6 @@
 #include "llvm/Support/Signals.h"
 #include "llvm/Support/raw_ostream.h"
 #include <system_error>
-
-#define BACKWARD_HAS_DWARF 1
 
 using namespace clang::tooling;
 using namespace llvm;
@@ -123,6 +122,7 @@ private:
 
 int main(int argc, const char **argv) {
   // sys::PrintStackTraceOnErrorSignal(argv[0]);
+  backward::SignalHandling sh;
 
   CommonOptionsParser OptionsParser(argc, argv, LSIFClangCategory,
                                     cl::OneOrMore);
