@@ -61,3 +61,8 @@ autoconf/autom4te.cache
 /clang/utils/analyzer/projects/*/PatchedSource
 /clang/utils/analyzer/projects/*/ScanBuildResults
 /clang/utils/analyzer/projects/*/RefScanBuildResults
+
+# Build output for lsif-clang
+bin/
+# Test output for indexing lsif-clang itself
+dump.lsif
