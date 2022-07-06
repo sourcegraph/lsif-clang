@@ -1,52 +1,53 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
-# Build lsif-clang in a container then extra out all the needed files.
+# Build lsif-clang in a container then extract out all the needed files.
 
 set -euo pipefail
 
 # Configuration
-image_name="lsif-clang-$USER"
-container_name="tmp-lsif-clang-build"
-
-# Learn about our environment
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
-root_dir="$script_dir/../../.."
-git_commit="$(git rev-parse HEAD)"
-
-output_filename="lsif-clang-aurora-${git_commit}"
-output_folder="${root_dir}/${output_filename}"
-archive_name="${output_filename}.tar.gz"
+IMAGE_NAME="lsif-clang-$USER"
+CONTAINER_NAME="tmp-lsif-clang-build"
 
 # Cleanup our container after usage
 dockercleanup() {
-    docker rm -f "$container_name" &> /dev/null || true
+    docker rm -f "$CONTAINER_NAME" &> /dev/null || true
 }
 
 trap dockercleanup EXIT ERR INT TERM
 dockercleanup
 
+# Learn about our environment
+cd "$(dirname "${BASH_SOURCE[0]}")"
+SCRIPT_DIR="$(pwd)"
+ROOT_DIR="$SCRIPT_DIR/../../.."
+GIT_COMMIT_SHA="$(git rev-parse HEAD)"
+
 # Build
-cd "$root_dir"
-echo "[Building image: $image_name]"
-docker build -f ubuntu_1804.Dockerfile -t "$image_name" .
+cd "$ROOT_DIR"
+echo "[Building image: $IMAGE_NAME]"
+docker build -f ubuntu_1804.Dockerfile -t "$IMAGE_NAME" .
 
 # Start a container with the image
-echo "[Starting temporary container: $container_name]"
-docker create --name "$container_name" "$image_name"
+echo "[Starting temporary container: $CONTAINER_NAME]"
+docker create --name "$CONTAINER_NAME" "$IMAGE_NAME"
+
+OUTPUT_TARBALL_BASENAME="lsif-clang-${GIT_COMMIT_SHA}"
+OUTPUT_DIR="${ROOT_DIR}/${OUTPUT_TARBALL_BASENAME}"
+TARBALL_NAME="${OUTPUT_TARBALL_BASENAME}.tar.gz"
 
 # Get the files we need out of the image
 echo "[Extracting needed files]"
-rm -rf "$output_folder"
-mkdir -p "$(dirname "$output_folder")"
+rm -rf "$OUTPUT_DIR"
+mkdir -p "$(dirname "$OUTPUT_DIR")"
 
-docker cp "$container_name:/usr/local/bin" "$output_folder"
+docker cp "$CONTAINER_NAME:/usr/local/bin" "$OUTPUT_DIR"
 
 # Install the shim in our package
-mv "$output_folder/lsif-clang" "$output_folder/lsif-clang.bin"
-cp "$script_dir/lsif_clang_shim.sh" "$output_folder/lsif-clang"
+mv "$OUTPUT_DIR/lsif-clang" "$OUTPUT_DIR/lsif-clang.bin"
+cp "$SCRIPT_DIR/lsif_clang_shim.sh" "$OUTPUT_DIR/lsif-clang"
 
-chown "$USER:$(id -g)" "$output_folder"/*
+chown "$USER:$(id -g)" "$OUTPUT_DIR"/*
 
 # Now create our tarball
-tar zcf "${archive_name}" "$output_filename"
-echo "Created: ${archive_name}"
+tar zcf "${TARBALL_NAME}" "$OUTPUT_TARBALL_BASENAME"
+echo "Created: ${TARBALL_NAME}"
