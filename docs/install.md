@@ -5,7 +5,7 @@ This project depends on LLVM and Clang. lsif-clang itself should be built agains
 ### Ubuntu (20.04)
 
 ```sh
-apt install llvm-11 clang clang-11 libclang-11-dev cmake binutils-dev libdwarf-dev libelf-dev
+apt install llvm-11 llvm-11-dev clang-11 libclang-11-dev cmake binutils-dev libdwarf-dev libelf-dev
 ```
 
 #### Older versions of Ubuntu
