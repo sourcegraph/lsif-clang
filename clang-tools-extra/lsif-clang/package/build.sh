@@ -25,7 +25,7 @@ GIT_COMMIT_SHA="$(git rev-parse --short HEAD)"
 # Build
 cd "$ROOT_DIR"
 echo "[Building image: $IMAGE_NAME]"
-docker build -f ubuntu_1804.Dockerfile -t "$IMAGE_NAME" .
+docker build -f Bundled_Ubuntu1804.Dockerfile -t "$IMAGE_NAME" .
 
 # Start a container with the image
 echo "[Starting temporary container: $CONTAINER_NAME]"
