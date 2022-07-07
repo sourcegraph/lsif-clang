@@ -1,53 +1,66 @@
-# Prerequisites
+# Installing lsif-clang
 
-This project depends on LLVM and Clang. lsif-clang itself should be built against LLVM and Clang version 11, and can index any code Clang 11 can compile.
+There are two ways of setting up lsif-clang, in increasing order of complexity:
+1. Use the existing bundled tarball from the [Releases page][],
+   which includes the `lsif-clang` binary and necessary dynamic libraries.
+   This has been tested for Ubuntu 18.04 and Ubuntu 20.04,
+   and should work for newer Ubuntu versions too.
+2. Build `lsif-clang` from source.
+3. Use a Docker image.
 
-### Ubuntu (20.04)
+We describe each of these in turn.
+
+[Releases page]: https://github.com/sourcegraph/lsif-clang/releases
+## Using the bundled tarball
+
+NOTE: This may or may not work on Linux distributions other than Ubuntu.
+
+Download a tarball from the [Releases page][] and unpack it (`tar -xzvf lsif-clang-<release>.tar.gz`).
+You should see an executable script named `lsif-clang`,
+which can be invoked normally.
+
+## Building from source
+
+### Install dependencies.
+
+#### Ubuntu
 
 ```sh
-apt install llvm-11 llvm-11-dev clang-11 libclang-11-dev cmake binutils-dev libdwarf-dev libelf-dev
+# Ubuntu 22.04
+sudo apt install llvm-11 llvm-11-dev clang-11 libclang-11-dev cmake binutils-dev libdwarf-dev libelf-dev
 ```
 
-#### Older versions of Ubuntu
+For installing dependencies in Ubuntu 18.04, see the corresponding [Dockerfile](Bundled_Ubuntu1804.Dockerfile).
 
-CMake version 3.16 or later is required (we've tested with CMake version 3.18.0). On older versions
-of Ubuntu, `apt` may not install a recent enough version of CMake. You can install CMake manually
-following the instructions here: https://cmake.org/download. We've tested this works on Ubuntu
-18.04. On even older versions of Ubuntu, you may have to manually install other dependencies if they
-don't exist in the `apt` package repository.
-
-### MacOS
+#### macOS
 
 ```sh
-brew install cmake sourcegraph/brew/llvm@11 binutils
+brew install cmake llvm@11 binutils
 ```
 
-> Note: lsif-clang must currently be built using LLVM 11
+### Clone and build
 
-# Installation
+```
+git clone https://github.com/sourcegraph/lsif-clang.git --depth=1
+```
 
-Make sure to checkout any submodules, either with `git clone --recurse-submodules ...` or `git submodule update --init --recursive`
-
-### Ubuntu
+#### Ubuntu
 
 ```sh
 cmake -B build
-make -C build -j8  # the -j argument sets the parallelism level
-sudo make -C build install
+make -C build -j8
 ```
-
-### MacOS
+#### macOS
 
 ```sh
-Clang_DIR=/usr/local/opt/llvm\@10/lib/cmake/clang cmake -B build -DPATH_TO_LLVM=/usr/local/opt/llvm\@10
-make -C build -j8  # the -j argument sets the parallelism level
-sudo make -C build install
+Clang_DIR=/usr/local/opt/llvm\@11/lib/cmake/clang cmake -B build -DPATH_TO_LLVM=/usr/local/opt/llvm\@11
+make -C build -j8
 ```
 
-Immediately after installing, you should run `lsif-clang`. If you encounter an error like "libLLVM.dylib cannot be opened because the developer cannot be verified", open **System Preferences > Security & Privacy > General** and click **Open Anyway** next to the message "libLLVM.dylib was blocked from use because it is not from an identified developer". Run `lsif-clang` again and click the **Open** button in the system dialog that pops up.
+<details>
+<summary>Troubleshooting missing ClangConfig.cmake error</summary>
 
-If you did not install LLVM 11 with Homebrew, you may need to modify the values of `Clang_DIR` and
-`-DPATH_TO_LLVM`. If you encounter the following error:
+If you encounter the following error:
 
 ```
 Could not find a package configuration file provided by "Clang" with any of the following names:
@@ -56,9 +69,12 @@ Could not find a package configuration file provided by "Clang" with any of the 
 	clang-config.cmake
 ```
 
-then, do the following:
+Double-check that `llvm@11` was installed correctly with `brew info llvm@11`.
+A successful installation should have output with something like "Poured from bottle on."
 
-1. Find the path to `ClangConfig.cmake`:
+If `llvm@11` was installed
+
+1. Manually the path to `ClangConfig.cmake`:
 
    ```
    find /usr/ -name ClangConfig.cmake
@@ -69,5 +85,32 @@ then, do the following:
    `bin`, `include`, `lib`, and `share` subdirectories.
 
    ```
-   Clang_DIR=/path/to/containing/dir cmake -B build -DPATH_TO_LLVM=/path/to/llvm/root
+   Clang_DIR="$(find /opt -name ClangConfig.cmake | head -n 1 | xargs dirname)" cmake -B build -DPATH_TO_LLVM=/path/to/llvm/root
    ```
+
+</details>
+
+### Cross-check
+
+Run `./bin/lsif-clang build/compile_commands.json > dump.lsif` to try indexing `lsif-clang`'s
+source code with itself. Usually, this should just work.
+
+<details>
+<summary>Troubleshooting macOS libLLVM.dylib error</summary>
+
+On macOS, if you encounter an error like "libLLVM.dylib cannot be opened because the developer cannot be verified", open **System Preferences > Security & Privacy > General** and click **Open Anyway** next to the message "libLLVM.dylib was blocked from use because it is not from an identified developer". Run `lsif-clang` again and click the **Open** button in the system dialog that pops up.
+
+</details>
+
+## Using a Docker image
+
+The [Sourcegraph docs on indexing C++](https://docs.sourcegraph.com/code_intelligence/how-to/index_a_cpp_repository#with-docker-recommended)
+describe how to use Docker to index C++ code.
+
+You need to make one change:
+- The prefix for setting up `lsif-clang` is out-of-date.
+  Instead, you can use:
+  ```
+  FROM sourcegraph/lsif-clang:latest
+  ```
+  as the base image.
