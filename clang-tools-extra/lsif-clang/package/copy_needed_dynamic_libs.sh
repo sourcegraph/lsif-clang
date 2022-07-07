@@ -22,6 +22,9 @@ OUTPUT="$2"
 # 2. The system libraries maintained backwards compatibility.
 #    (It seems OK to roll with this assumption. We've manually
 #     verified it for Ubuntu 18.04 -> Ubuntu 20.04)
-for LIB in $(ldd "$BINARY" | cut -d ">" -f 2 | awk '{print $1}' | grep -vE "(linux-vdso\.|ld-linux-x86-64\.|libc\.|librt\.|libpthread\.)"); do
+DYN_LIBS="$(ldd "$BINARY")"
+echo "Dynamic libraries linked by lsif-clang:"
+echo "$DYN_LIBS"
+for LIB in $(echo "$DYN_LIBS" | cut -d ">" -f 2 | awk '{print $1}' | grep -vE "(linux-vdso\.|ld-linux-x86-64\.|libc\.|librt\.|libpthread\.)"); do
     cp --verbose "$LIB" "$OUTPUT/"
 done
