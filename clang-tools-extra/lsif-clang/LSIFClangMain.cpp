@@ -92,7 +92,7 @@ public:
           }
         },
         [&](clang::clangd::RefSlab S) {
-          std::lock_guard<std::mutex> Lock(SymbolsMu);
+          std::lock_guard<std::mutex> Lock(RefsMu);
           for (const auto &Sym : S) {
             // Deduplication happens during insertion.
             for (const auto &Ref : Sym.second)
@@ -100,7 +100,7 @@ public:
           }
         },
         [&](clang::clangd::RelationSlab S) {
-          std::lock_guard<std::mutex> Lock(SymbolsMu);
+          std::lock_guard<std::mutex> Lock(RelationsMu);
           for (const auto &R : S) {
             Relations.insert(R);
           }
@@ -120,7 +120,9 @@ private:
   clang::clangd::IndexFileIn &Result;
   std::mutex SymbolsMu;
   clang::clangd::SymbolSlab::Builder Symbols;
+  std::mutex RefsMu;
   clang::clangd::RefSlab::Builder Refs;
+  std::mutex RelationsMu;
   clang::clangd::RelationSlab::Builder Relations;
   std::string &ProjectRoot;
 };

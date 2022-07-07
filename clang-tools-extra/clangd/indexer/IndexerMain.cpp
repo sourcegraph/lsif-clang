@@ -55,7 +55,7 @@ public:
           }
         },
         [&](RefSlab S) {
-          std::lock_guard<std::mutex> Lock(SymbolsMu);
+          std::lock_guard<std::mutex> Lock(RefsMu);
           for (const auto &Sym : S) {
             // Deduplication happens during insertion.
             for (const auto &Ref : Sym.second)
@@ -63,7 +63,7 @@ public:
           }
         },
         [&](RelationSlab S) {
-          std::lock_guard<std::mutex> Lock(SymbolsMu);
+          std::lock_guard<std::mutex> Lock(RelationsMu);
           for (const auto &R : S) {
             Relations.insert(R);
           }
@@ -83,7 +83,9 @@ private:
   IndexFileIn &Result;
   std::mutex SymbolsMu;
   SymbolSlab::Builder Symbols;
+  std::mutex RefsMu;
   RefSlab::Builder Refs;
+  std::mutex RelationsMu;
   RelationSlab::Builder Relations;
 };
 
