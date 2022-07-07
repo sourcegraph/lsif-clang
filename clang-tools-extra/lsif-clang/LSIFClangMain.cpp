@@ -79,6 +79,16 @@ public:
     IndexOpts.IndexMacrosInPreprocessor = true;
     IndexOpts.SystemSymbolFilter =
         clang::index::IndexingOptions::SystemSymbolFilterKind::All;
+    Opts.FileFilter = [&](const clang::SourceManager &SM, clang::FileID FID) {
+      const auto *F = SM.getFileEntryForID(FID);
+      if (!F)
+        return false; // Skip invalid files.
+      auto AbsPath = clang::clangd::getCanonicalPath(F, SM);
+      if (!AbsPath)
+        return false; // Skip files without absolute path.
+      std::lock_guard<std::mutex> Lock(FilesMu);
+      return Files.insert(*AbsPath).second; // Skip already processed files.
+    };
     return createStaticIndexingAction(
         Opts, IndexOpts,
         [&](clang::clangd::SymbolSlab S) {
@@ -92,7 +102,7 @@ public:
           }
         },
         [&](clang::clangd::RefSlab S) {
-          std::lock_guard<std::mutex> Lock(SymbolsMu);
+          std::lock_guard<std::mutex> Lock(RefsMu);
           for (const auto &Sym : S) {
             // Deduplication happens during insertion.
             for (const auto &Ref : Sym.second)
@@ -100,7 +110,7 @@ public:
           }
         },
         [&](clang::clangd::RelationSlab S) {
-          std::lock_guard<std::mutex> Lock(SymbolsMu);
+          std::lock_guard<std::mutex> Lock(RelationsMu);
           for (const auto &R : S) {
             Relations.insert(R);
           }
@@ -118,9 +128,13 @@ public:
 
 private:
   clang::clangd::IndexFileIn &Result;
+  std::mutex FilesMu;
+  llvm::StringSet<> Files;
   std::mutex SymbolsMu;
   clang::clangd::SymbolSlab::Builder Symbols;
+  std::mutex RefsMu;
   clang::clangd::RefSlab::Builder Refs;
+  std::mutex RelationsMu;
   clang::clangd::RelationSlab::Builder Relations;
   std::string &ProjectRoot;
 };
