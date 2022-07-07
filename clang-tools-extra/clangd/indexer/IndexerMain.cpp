@@ -42,6 +42,16 @@ public:
   std::unique_ptr<FrontendAction> create() override {
     SymbolCollector::Options Opts;
     Opts.CountReferences = true;
+    Opts.FileFilter = [&](const clang::SourceManager &SM, clang::FileID FID) {
+      const auto *F = SM.getFileEntryForID(FID);
+      if (!F)
+        return false; // Skip invalid files.
+      auto AbsPath = clang::clangd::getCanonicalPath(F, SM);
+      if (!AbsPath)
+        return false; // Skip files without absolute path.
+      std::lock_guard<std::mutex> Lock(FilesMu);
+      return Files.insert(*AbsPath).second; // Skip already processed files.
+    };
     return createStaticIndexingAction(
         Opts,
         [&](SymbolSlab S) {
@@ -81,6 +91,8 @@ public:
 
 private:
   IndexFileIn &Result;
+  std::mutex FilesMu;
+  llvm::StringSet<> Files;
   std::mutex SymbolsMu;
   SymbolSlab::Builder Symbols;
   std::mutex RefsMu;
