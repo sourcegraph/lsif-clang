@@ -10,7 +10,7 @@ RUN CC=clang-11 CXX=clang-11 cmake -B build && make -C build -j$(nproc)
 
 FROM ubuntu:22.04
 
-RUN apt update && apt install -y libllvm11 cmake clang-11
+RUN apt update && apt install -y libllvm11 cmake clang-11 libdwarf-dev
 
 # Might as well set this, for auto-index purposes
 ENV DEBIAN_FRONTEND=noninteractive
