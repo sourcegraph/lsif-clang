@@ -19,7 +19,7 @@ def run_lsif_clang(q, sema, lsif_clang_abspath, compile_commands_abspath):
                           stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         output = proc.stdout.decode('utf-8')
         # Looks like lsif-clang's exit code is always 0 :(
-        if proc.returncode != 0 or 'error: ' in output:
+        if proc.returncode != 0 or 'Stack trace (most recent call last) in thread' in output:
             exitcode = 1
     except Exception as e:
         err = e
@@ -75,17 +75,20 @@ def default_main():
             # everything else work as-is.
             entry['command'] += ' -working-directory={}'.format(workdir)
             jobs.append(entry)
-    
+
     concurrency = min(args.concurrency, len(jobs))
 
     mp.set_start_method('spawn')
     status_queue = mp.Queue()
     sema = mp.Semaphore(value=concurrency)
 
+    completed = 0
     def drain_queue(q):
         count = 0
         while not q.empty(): # Did any processes complete?
             exitcode, output, compile_commands_abspath = q.get()
+            nonlocal completed
+            completed += 1
             if exitcode != 0:
                 tmpdir = tempfile.mkdtemp('-repro')
                 json_copy = '{}/compile_commands.json'.format(tmpdir)
@@ -95,8 +98,14 @@ def default_main():
                 count += 1
                 if args.fail_fast:
                     sys.exit(1)
+            else:
+                with open(compile_commands_abspath, 'r') as compdb:
+                  entries = json.load(compdb)
+                  entry = entries[0]
+                  print("[{}/{}] Indexed {}".format(completed, len(jobs), entry['file']))
+                  sys.stdout.flush()
         return count
-    
+
     num_failures = 0
 
     with tempfile.TemporaryDirectory('-bisect-lsif-clang') as tempdir:
@@ -111,7 +120,7 @@ def default_main():
                 json.dump([job], json_file)
             proc = mp.Process(target=run_lsif_clang, args=(status_queue, sema, str(lsif_clang_path), json_file_path))
             proc.start()
-    
+
         for _ in range(args.concurrency):
             # Make sure to wait for any processes that were spawned at the end
             sema.acquire()
@@ -122,7 +131,7 @@ def default_main():
     # semaphore and queue operations, but maybe that's allowed?
     if num_failures > 0:
         print('{}/{} lsif-clang commands failed. 😭'.format(num_failures, len(jobs)))
-    else:    
+    else:
         print('All lsif-clang commands ran successfully! 🎉')
 
 if __name__ == '__main__':
