@@ -8,8 +8,14 @@ but it hasn't been well-tested.
 See the [compatibility](docs/compatibility.md) page for
 information about support build configurations.
 
-It's a work-in-progress, so it doesn't have the same functionality
-as other Sourcegraph indexers like lsif-go, scip-java or scip-typescript.
+Example: [Chromium](https://sourcegraph.com/github.com/chromium/chromium@cab0660/-/blob/base/values.h?L204:29-204:34#tab=references)
+
+Right now, lsif-clang is in maintenance mode.
+It is usable for large projects with a bit of manual configuration;
+and it doesn't have the same functionality
+as other Sourcegraph indexers like scip-java or scip-typescript.
+We are actively working on a [new SCIP indexer for C++](https://github.com/sourcegraph/scip-clang)
+which will supersede lsif-clang in the future.
 
 ## Usage
 
